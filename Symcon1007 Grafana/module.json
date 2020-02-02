@@ -1,0 +1,14 @@
+{
+	"id": "{6AD3BD73-A22A-D5B2-A0F0-5B5EEA5C387A}",
+	"name": "Grafana",
+	"type": 0,
+	"vendor": "",
+	"aliases": 
+	[
+		"Grafana"
+	],
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "GRF"
+}
