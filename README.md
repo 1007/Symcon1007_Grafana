@@ -9,9 +9,9 @@
 3. [Installation](#3-installation)
 4. [Konfiguration](#4-konfiguration)
 5. [Grafana](#5-grafana)
-6. [Grafana Tips](#6-grafanatips)
+6. [Grafana Tips](#6-grafana tips)
 7. [Changelog](#7-changelog)
-8. [ToDo Liste](#8-todo)
+8. [ToDo Liste](#8-todo liste)
 
 
 ## 1. Funktionsumfang
