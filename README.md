@@ -43,13 +43,20 @@ Dienst neu starten.
 
 Sollten die Grafiken im Webfront nicht angezeigt werden folgendes aendern in ini-Datei:
 
+
 Von:
 	allow_embedding: false
 	cookie_samesite: lax
+
+
 Nach:
+
 	allow_embedding: true
 	cookie_samesite: none
+
+
 Neustart nicht vergessen
+
 
 Wenn ihr in der Userverwaltung User nur mit Login habt.
 Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
@@ -58,6 +65,7 @@ Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
 ## 7. Changelog
 
 ## 8. ToDo Liste
-Aggregationsstufen optimieren
+Aggregationsstufen optimieren.
 
+Dokumentation verbessern.
 
