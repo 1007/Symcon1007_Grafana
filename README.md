@@ -15,6 +15,8 @@
 
 
 ## 1. Funktionsumfang
+Dieses Modul bietet Grafana direkten Zugang zu allen geloggten Variablen. 
+Alle geloggten Variablen stehen automatisch in Grafana als Metrics zu Verfuegung.
 
 
 ## 2. Systemanforderungen
