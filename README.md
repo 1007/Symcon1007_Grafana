@@ -9,9 +9,9 @@
 3. [Installation](#3-installation)
 4. [Konfiguration](#4-konfiguration)
 5. [Grafana](#5-grafana)
-6. [Grafana Tips](#6-grafana tips)
+6. [Grafana Tips](#6-grafanatips)
 7. [Changelog](#7-changelog)
-8. [ToDo Liste](#8-todo liste)
+8. [ToDo Liste](#8-todoliste)
 
 
 ## 1. Funktionsumfang
@@ -36,15 +36,17 @@ Wer den Debug sich anschauen will, ist die Instanz in den Kerninstanzen zu finde
 
 ## 5. Grafana
 
-## 6. Grafana Tips
+## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
-gemacht werden. Die Datei defaults.ini kopieren nach custom.ini oder grafana.ini.
+gemacht werden.Die Datei defaults.ini kopieren nach custom.ini oder grafana.ini.
+
 Dienst neu starten.
 
 Sollten die Grafiken im Webfront nicht angezeigt werden folgendes aendern in ini-Datei:
 
 
 Von:
+
 	allow_embedding: false
 	cookie_samesite: lax
 
@@ -64,7 +66,9 @@ Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
 
 ## 7. Changelog
 
-## 8. ToDo Liste
+Version 1.0	Startup
+
+## 8. ToDoListe
 Aggregationsstufen optimieren.
 
 Dokumentation verbessern.
