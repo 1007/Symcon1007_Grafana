@@ -42,6 +42,7 @@ gemacht werden. Die Datei defaults.ini kopieren nach custom.ini oder grafana.ini
 Dienst neu starten.
 
 Sollten die Grafiken im Webfront nicht angezeigt werden folgendes aendern in ini-Datei:
+
 Von:
 	allow_embedding: false
 	cookie_samesite: lax
