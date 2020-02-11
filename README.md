@@ -14,6 +14,8 @@
 8. [ToDo Liste](#8-todo)
 
 
+## 1. Funktionsumfang
+
 
 ## 2. Systemanforderungen
 - IP-Symcon ab Version 4.x
