@@ -31,6 +31,7 @@ Instanz hinzufuegen.
 
 ## 4. Konfiguration
 In IPSymcon ist keine Konfiguration noetig.
+
 Wer den Debug sich anschauen will, ist die Instanz in den Kerninstanzen zu finden.
 
 ## 5. Grafana
