@@ -37,6 +37,9 @@ In IPSymcon ist keine Konfiguration noetig.
 Wer den Debug sich anschauen will, ist die Instanz in den Kerninstanzen zu finden.
 
 ## 5. Grafana
+Konfiguration des Plugins JSON by simpod
+![Plugin](DataSources.png?raw=true "Plugin")
+
 
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
