@@ -79,6 +79,8 @@ Neustart nicht vergessen
 Wenn ihr in der Userverwaltung User nur mit Login habt.
 Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
 
+Wer nur den Graph braucht, ohne die Auswahlmoeglichkeiten fuer Zeiten,
+nimmt am Besten nur den Link unter Share-Panel-Embed
 
 ## 7. Changelog
 
