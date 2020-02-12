@@ -41,6 +41,16 @@ Konfiguration des Plugins JSON by simpo
 zum Beispiel:
 ![Plugin](images/DataSources.png?raw=true "Plugin")
 
+Grafiken in Grafana erstellen:
+
+-Einloggen mit Port 3000.
+-Dashboard erstellen
+-Darin ein Panel, oder mehrere, erstellen
+-Add Query . Darin JSON auswaehlen
+-Unter Metric koennen alle geloggten Variablen ausgewaehlt werden.
+-Erster Wert ist die ID
+-Zweiter Wert ist der Name fuer die Legende ( aenderbar)
+-URL auswaehlen fuer Webfront/IPSView unter Menuepunkt Share.
 
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
