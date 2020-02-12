@@ -39,7 +39,7 @@ Wer den Debug sich anschauen will, ist die Instanz in den Kerninstanzen zu finde
 ## 5. Grafana
 Konfiguration des Plugins JSON by simpo
 zum Beispiel:
-![Plugin](images/DataSources.png?raw=true "Plugin")
+![Plugin](imgs/DataSources.png?raw=true "Plugin")
 
 Grafiken in Grafana erstellen:
 
