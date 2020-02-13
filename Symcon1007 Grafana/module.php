@@ -83,82 +83,85 @@
 			return;	
 			}
 
-		$x = 0;
+		$x = 0; 
 
-		foreach($d['targets'] as $target)
+		if ($data_app == "dashboard") 
 			{
-			$data_target[$x] = $target['target'];
+			foreach ($d['targets'] as $target) 
+				{
+                $data_target[$x] = $target['target'];
 
-			$this->SendDebug(__FUNCTION__,"Target:".$data_target[$x],0);
-			$x++;
+                $this->SendDebug(__FUNCTION__, "Target:".$data_target[$x], 0);
+                $x++;
+            	}
+    
+            $data_rangefrom = $d['range']['from'];
+            $data_rangeto   = $d['range']['to'];
+
+
+            $this->SendDebug(__FUNCTION__, "From:".$data_rangefrom, 0);
+            $this->SendDebug(__FUNCTION__, "To:".$data_rangeto, 0);
+
+
+            $data_rangefrom = strtotime($d['range']['from']);
+            $data_rangeto   = strtotime($d['range']['to']);
+
+
+            $this->SendDebug(__FUNCTION__, "From:".$this->TimestampToDate($data_rangefrom), 0);
+            $this->SendDebug(__FUNCTION__, "To:".$this->TimestampToDate($data_rangeto), 0);
+
+
+            $agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto);
+
+            $data_starttime = $d['startTime'];
+            $data_starttime = intval($data_starttime/1000);
+            $data_starttime = $this->TimestampToDate($data_starttime);
+
+
+            $this->SendDebug(__FUNCTION__, "Startime:".$data_starttime, 0);
+
+            $stringall = "";
+            foreach ($data_target as $dataID) {
+                $pieces = explode(",", $dataID);
+
+                $ID = $pieces[0];
+                $target = @$pieces[1];
+
+                $this->SendDebug(__FUNCTION__, "Data ID:".$ID, 0);
+            
+                if (isset($ID) == false) {
+                    continue;
+                }
+                if ($this->CheckVariable($ID) == false) {
+                    continue;
+                }
+               
+                $array = IPS_GetVariable($ID);
+                $typ = $array['VariableType'];
+
+                // Archivdaten fuer eine Variable holen
+                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe);
+            
+                $count = count($data);
+                $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
+
+                if ($count > 0) {
+                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe);
+                    $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
+
+                    $stringall = $stringall . "" .$string ;
+                };
+            }
+            
+            $string = $this->CreateHeaderReturnString($stringall);
+
+            $this->SendDebug(__FUNCTION__, "Data String ALL :".$string, 0);
+        
+            echo $string;
+
+            // $this->sendtest();
 			}
-	
-		$data_rangefrom = $d['range']['from'];
-		$data_rangeto   = $d['range']['to'];
-
-
-		$this->SendDebug(__FUNCTION__,"From:".$data_rangefrom,0);
-		$this->SendDebug(__FUNCTION__,"To:".$data_rangeto,0);
-
-
-		$data_rangefrom = strtotime($d['range']['from']);
-		$data_rangeto   = strtotime($d['range']['to']);
-
-
-		$this->SendDebug(__FUNCTION__,"From:".$this->TimestampToDate($data_rangefrom),0);
-		$this->SendDebug(__FUNCTION__,"To:".$this->TimestampToDate($data_rangeto),0);
-
-
-		$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom,$data_rangeto);
-
-		$data_starttime = $d['startTime'];
-		$data_starttime = intval($data_starttime/1000 );
-		$data_starttime = $this->TimestampToDate($data_starttime);
-
-
-		$this->SendDebug(__FUNCTION__,"Startime:".$data_starttime,0);
-
-		$stringall = "";
-		foreach( $data_target as $dataID )
-			{
 			
-			$pieces = explode(",",$dataID);
-
-			$ID = $pieces[0];
-			$target = @$pieces[1];
-
-			$this->SendDebug(__FUNCTION__,"Data ID:".$ID,0);
-			
-			if ( isset($ID) == false )
-				continue;
-			if ( $this->CheckVariable($ID) == false )
-				continue;
-			   
-			$array = IPS_GetVariable($ID);
-			$typ = $array['VariableType'];
-
-			// Archivdaten fuer eine Variable holen
-			$data = $this->GetArchivData($ID,$data_rangefrom,$data_rangeto,$agstufe);
-			
-			$count = count($data);
-			$this->SendDebug(__FUNCTION__,"Data Count:".$count,0);
-
-            if ($count > 0) 
-            	{
-                $string = $this->CreateReturnString($data, $target, $typ,$agstufe);
-                $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
-
-                $stringall = $stringall . "" .$string ;
-           		};	
-			}
-			
-		$string = $this->CreateHeaderReturnString($stringall);
-
-		$this->SendDebug(__FUNCTION__,"Data String ALL :".$string,0);
-		
-		echo $string;
-
-		// $this->sendtest();
 
 		}
 
