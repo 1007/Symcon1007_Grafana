@@ -158,11 +158,15 @@
             $this->SendDebug(__FUNCTION__, "Data String ALL :".$string, 0);
         
             echo $string;
-
+			
             // $this->sendtest();
+			return;
+
 			}
 			
-
+		$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
+		
+		
 		}
 
 	//******************************************************************************
