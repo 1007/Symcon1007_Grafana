@@ -493,9 +493,15 @@
 	public function Destroy()
 		{
 
-		$this->UnregisterHook("");
-		$this->UnregisterHook("/query");
-		$this->UnregisterHook("/search");
+		$this->Logmessage("Destroy wird ausgefuehrt!",KL_WARNING);
+
+		// if (!IPS_InstanceExists($this->InstanceID)) // Instanz wurde eben gelöscht und existiert nicht mehr
+			{
+            $this->UnregisterHook("");
+            $this->UnregisterHook("/query");
+            $this->UnregisterHook("/search");
+			}
+			
 
 		//Never delete this line!
 		parent::Destroy();
