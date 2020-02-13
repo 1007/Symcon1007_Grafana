@@ -166,7 +166,7 @@
 			
 		$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
 		
-		
+
 		}
 
 	//******************************************************************************
@@ -378,7 +378,7 @@
 
 		if ( !isset($archive_id) )
 			{
-			IPS_Logmessage(basename(__CLASS__),"Archive Control nicht gefunden!");
+			$this->Logmessage(basename(__CLASS__)."Archive Control nicht gefunden!",KL_WARNING);
 			return false;
 			}
 		
@@ -392,7 +392,6 @@
 	//******************************************************************************
 	protected function CheckVariable($var)
 		{
-		
 		$archiv = $this->GetArchivID();
 		
 		$status = IPS_VariableExists($var);
@@ -401,7 +400,7 @@
 			$status = AC_GetLoggingStatus($archiv,$var);
 		
 		if ( $status == false )
-			IPS_Logmessage(basename(__CLASS__),"Grafana Variable ID ".$var." Fehler !");
+			$this->Logmessage(basename(__CLASS__)."Grafana Variable ID ".$var." Fehler !",KL_WARNING);
 			
 		return $status;
 		}
