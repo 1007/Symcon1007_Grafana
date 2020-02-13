@@ -55,6 +55,10 @@
 		else
 			$data_type = "";
 
+		// Sonderfall weil ohne 'type' ????????	
+		if ( isset($d['target'] ) )
+		   $data_target = $d['target'];
+
 		$data_app 				= @$d['app'];
 		$data_requestId 		= @$d['requestId'];
 		$data_timezone 			= @$d['timezone'];
@@ -62,8 +66,8 @@
 		$data_dashboardId		= @$d['dashboardId'];
 		$data_interval			= @$d['interval'];
 		$data_maxDataPoints		= @$d['maxDataPoints'];
-
-
+    
+        
     	$this->SendDebug(__FUNCTION__,"Raw:".$data,0);
     	$this->SendDebug(__FUNCTION__,"APP:".$data_app,0);
     	$this->SendDebug(__FUNCTION__,"TYPE:".$data_type,0);
@@ -73,9 +77,19 @@
     	$this->SendDebug(__FUNCTION__,"Dashboard:".$data_dashboardId,0);
     	$this->SendDebug(__FUNCTION__,"Intervall:".$data_interval,0);
     	$this->SendDebug(__FUNCTION__,"MaxDatapoints:".$data_maxDataPoints,0);
-    	
 		
-		if ( $data_type == "timeseries" )		// Request Metrics
+		if (isset($data_target)) 
+			{
+            $this->SendDebug(__FUNCTION__, "Target ist gesetzt", 0);
+            $targetset = true;
+        	}	
+		else
+			{
+			$this->SendDebug(__FUNCTION__, "Target ist nicht gesetzt", 0);
+			$targetset = false;
+			}	
+
+		if ( $data_type == "timeseries" or $targetset == true)		// Request Metrics
 			{
 			$string = $this->ReturnMetrics();	
 			$this->SendDebug(__FUNCTION__,"RequestMetrics:".$string,0);
@@ -378,7 +392,7 @@
 
 		if ( !isset($archive_id) )
 			{
-			$this->Logmessage(basename(__CLASS__)."Archive Control nicht gefunden!",KL_WARNING);
+			$this->Logmessage("Archive Control nicht gefunden!",KL_WARNING);
 			return false;
 			}
 		
@@ -400,7 +414,7 @@
 			$status = AC_GetLoggingStatus($archiv,$var);
 		
 		if ( $status == false )
-			$this->Logmessage(basename(__CLASS__)."Grafana Variable ID ".$var." Fehler !",KL_WARNING);
+			$this->Logmessage("Grafana Variable ID ".$var." Fehler !",KL_WARNING);
 			
 		return $status;
 		}
