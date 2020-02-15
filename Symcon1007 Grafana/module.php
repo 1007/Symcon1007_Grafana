@@ -223,6 +223,7 @@
 		$stufe = 99;
 		
 		$days = ($to-$from)/(3600*24);	
+		$hours = ($to-$from)/(3600);
 
 		if ($aggType == 0) 
 			{
@@ -235,9 +236,19 @@
                 $stufe = 1;
             	}
 			}
+
+		
 		if ($aggType == 1) 
 			{
 			$stufe = 0;	
+			if ( $hours < 2 )
+				$stufe = 5;
+
+			if( $days > 2 )
+				$stufe = 1;	
+			if( $days > 30 )
+				$stufe = 2;		
+			
 			}
 				
 		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
