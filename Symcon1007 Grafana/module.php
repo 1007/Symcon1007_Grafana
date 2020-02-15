@@ -99,7 +99,7 @@
 
 		$x = 0; 
 
-		if ($data_app == "dashboard") 
+		if ($data_app == "dashboard") ; 	// Manchmal fehlt dashboard
 			{
 			foreach ($d['targets'] as $target) 
 				{
@@ -180,8 +180,10 @@
 			return;
 
 			}
+		
 			
-		$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
+		if ($data_app != "dashboard") 	
+			$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
 		
 
 		}
@@ -383,8 +385,8 @@
 		
 		if ( $aggType ==1 )
 		{
-		 // $werte[0]['Avg']	= 0;
-     
+		 // Neuesten Wert loeschen.Wegen Anzeige.Werte sind noch nicht komplett
+		 array_pop($reversed);
 		}	
 
 		$erster_Wert = 0;
