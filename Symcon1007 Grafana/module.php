@@ -124,8 +124,9 @@
             $this->SendDebug(__FUNCTION__, "From:".$this->TimestampToDate($data_rangefrom), 0);
             $this->SendDebug(__FUNCTION__, "To:".$this->TimestampToDate($data_rangeto), 0);
 
+			
 
-            $agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto);
+            // $agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto);
 
             $data_starttime = $d['startTime'];
             $data_starttime = intval($data_starttime/1000);
@@ -149,13 +150,15 @@
                 if ($this->CheckVariable($ID) == false) {
                     continue;
                 }
-               
+			   
+				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID);
+
                 $array = IPS_GetVariable($ID);
                 $typ = $array['VariableType'];
 
                 // Archivdaten fuer eine Variable holen
-                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe);
-            
+                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+                
                 $count = count($data);
                 $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
 
@@ -212,18 +215,32 @@
 	//  Stufe 6		1-Minuetige Aggregation
 	// 	Stufe 99	keine Aggregation 
 	//******************************************************************************	
-	protected function CheckZeitraumForAggregatedValues($from,$to)
+	protected function CheckZeitraumForAggregatedValues($from,$to,$varID)
 		{
-		$stufe = 99;
+		$archiv = $this->GetArchivID();
+		$aggType = AC_GetAggregationType($archiv,$varID);
 
+		$stufe = 99;
+		
 		$days = ($to-$from)/(3600*24);	
 
-		if ( $days > 7 )
-			$stufe = 0;
-		if ( $days > 100 )
-			$stufe = 1;
-			
-		$s = "Anzahl Tage:".$days . "Aggreagationsstufe:".$stufe;
+		if ($aggType == 0) 
+			{
+			if ($days > 7) 
+				{
+                $stufe = 0;
+            	}
+			if ($days > 100) 
+				{
+                $stufe = 1;
+            	}
+			}
+		if ($aggType == 1) 
+			{
+			$stufe = 0;	
+			}
+				
+		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
 
 		$this->SendDebug(__FUNCTION__,$s,0);
 
@@ -321,12 +338,14 @@
 	//******************************************************************************
 	//	Werte einer Variablen aus dem Archiv holen
 	//******************************************************************************
-	protected function GetArchivData($id,$from,$to,$agstufe)
+	protected function GetArchivData($id,$from,$to,$agstufe,$typ)
 		{
 
 		$werte = array();
 
 		$archiv = $this->GetArchivID();
+		$aggType = AC_GetAggregationType($archiv,$id);
+
 
 		if ( $agstufe == 99)
 			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0); 
@@ -335,12 +354,48 @@
 			$werte = AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
 			}	
 
+			/* 
+			foreach($werte as $wert )
+			{
+				IPS_Logmessage(__CLASS__,$wert['Avg']);
+
+
+			}
+			*/ 
+
 		$reversed = array_reverse($werte);
 		
-		// letzen Wert holen
-		$letzter_Wert = AC_GetLoggedValues($archiv, $id , 0, 0, 1)[0]['Value'];	
-		$erster_Wert  = @AC_GetLoggedValues($archiv, $id , 0, $from-1, 1)[0]['Value'];	// erster Wert vorhanden ?
+		$count = count($werte);
+		
 
+		
+		
+		if ( $aggType ==1 )
+		{
+		 // $werte[0]['Avg']	= 0;
+     
+		}	
+
+		$erster_Wert = 0;
+		$letzter_Wert = 0;
+
+		if ($aggType == 0) 
+			{
+            $letzter_Wert = AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
+            $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1)[0]['Value'];	// erster Wert vorhanden ?
+			}
+		
+		/*
+		if ( $typ == 0 )
+			{
+			if ( $erster_Wert == true)
+				$erster_Wert = 1;
+			else
+				$erster_Wert = 0;	
+		
+			}
+		*/	
+			
 		$s = "Erster Wert:".$erster_Wert." - Letzter Wert:".$letzter_Wert;
 		$this->SendDebug(__FUNCTION__,$s,0);
 
@@ -493,8 +548,9 @@
 	public function Destroy()
 		{
 
+		IPS_Logmessage(__CLASS__,"Destroy");	
 		$this->Logmessage("Destroy wird ausgefuehrt!",KL_WARNING);
-
+			
 		// if (!IPS_InstanceExists($this->InstanceID)) // Instanz wurde eben gelöscht und existiert nicht mehr
 			{
             $this->UnregisterHook("");
