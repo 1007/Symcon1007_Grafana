@@ -97,6 +97,14 @@
 			return;	
 			}
 
+		if ( $data_app == "explore" )		// Explore
+			{
+			$string = $this->ReturnMetrics();	
+			$this->SendDebug(__FUNCTION__,"Explore:".$string,0);
+			// echo $string;	
+			// return;	
+			}
+	
 		$x = 0; 
 
 		if ($data_app == "dashboard") ; 	// Manchmal fehlt dashboard
@@ -162,6 +170,22 @@
                 $count = count($data);
                 $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
 
+				if( $count > 9999 )		// Maximale Anzahl Daten erreicht
+					{
+					if ( $agstufe == 99 )
+						$agstufe = 0;
+					else 
+						$agstufe = $agstufe +1;
+					if( $agstufe > 5)
+						$agstufe = 5;
+						
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+                
+					$count = count($data);
+					$this->SendDebug(__FUNCTION__, "2. Versuch Data Count:".$count, 0);
+
+					}
+
                 if ($count > 0) {
                     $string = $this->CreateReturnString($data, $target, $typ, $agstufe);
                     $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
@@ -173,15 +197,24 @@
             $string = $this->CreateHeaderReturnString($stringall);
 
             $this->SendDebug(__FUNCTION__, "Data String ALL :".$string, 0);
-        
-            echo $string;
+		
+			/* 
+			if ( $string == "[]" )	// Keine Daten, dann auch nicht senden
+				{
+				$string = "[{}]";	
+				$this->SendDebug(__FUNCTION__, "Data String ALL leer:", 0);
+                // return;
+                }	
+			*/ 
+			
+			echo $string;
 			
             // $this->sendtest();
 			return;
 
 			}
 		
-			
+
 		if ($data_app != "dashboard") 	
 			$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
 		
@@ -386,7 +419,7 @@
 		if ( $aggType ==1 )
 		{
 		 // Neuesten Wert loeschen.Wegen Anzeige.Werte sind noch nicht komplett
-		 array_pop($reversed);
+		 // array_pop($reversed);
 		}	
 
 		$erster_Wert = 0;
@@ -413,20 +446,25 @@
 		$this->SendDebug(__FUNCTION__,$s,0);
 
 
+		if ($aggType == 0)	// Bei Zaehler keine erster/letzter Wert wegen komischer Anzeige (kleine Balken)
+			{
+            // Damit Graph bis zum Ende geht
+            if ($agstufe == 99) {
+                array_push($reversed, array("TimeStamp"=>$to,"Value"=>$letzter_Wert));
+            } else {
+                array_push($reversed, array("TimeStamp"=>$to,"Avg"=>$letzter_Wert));
+            }
+        
+            // Damit Graph bis zum Anfang geht
+            if ($erster_Wert != false) {
+                if ($agstufe == 99) {
+                    array_unshift($reversed, array("TimeStamp"=>$from,"Value"=>$erster_Wert));
+                } else {
+                    array_unshift($reversed, array("TimeStamp"=>$from,"Avg"=>$erster_Wert));
+                }
+            }
+        	}		
 
-		// Damit Graph bis zum Ende geht
-		if ( $agstufe == 99)
-			array_push($reversed,array("TimeStamp"=>$to,"Value"=>$letzter_Wert));
-		else
-			array_push($reversed,array("TimeStamp"=>$to,"Avg"=>$letzter_Wert));
-		
-		// Damit Graph bis zum Anfang geht
-		if ( $erster_Wert != false )
-			if ( $agstufe == 99  )
-				array_unshift($reversed,array("TimeStamp"=>$from,"Value"=>$erster_Wert));
-			else
-				array_unshift($reversed,array("TimeStamp"=>$from,"Avg"=>$erster_Wert));
-							
 		return $reversed;
 		}
 
@@ -560,11 +598,8 @@
 	//**************************************************************************
 	public function Destroy()
 		{
-
-		IPS_Logmessage(__CLASS__,"Destroy");	
-		$this->Logmessage("Destroy wird ausgefuehrt!",KL_WARNING);
-			
-		// if (!IPS_InstanceExists($this->InstanceID)) // Instanz wurde eben gelöscht und existiert nicht mehr
+		
+		if (!IPS_InstanceExists($this->InstanceID)) // Instanz wurde eben gelöscht und existiert nicht mehr
 			{
             $this->UnregisterHook("");
             $this->UnregisterHook("/query");
