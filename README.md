@@ -82,6 +82,24 @@ Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
 Wer nur den Graph braucht, ohne die Auswahlmoeglichkeiten fuer Zeiten,
 nimmt am Besten nur den Link unter Share-Panel-Embed
 
+Hintergrundfarbe auf "Transparent" setzen funktioniert nicht.
+In die index.html folgende Zeile einfuegen
+
+	<link rel="stylesheet" href="https://....../user/Grafana/mygrafana.css" type="text/css">
+
+
+Entsprechend die mygrafana.css erstellen und folgendes eintragen.
+
+	@charset "UTF-8";
+
+	.panel-container {
+	background-color: #xxxxxx !important;
+	border: 0px solid #FFFFFF !important;
+	}
+
+
+
+
 ## 7. Changelog
 
 Version 1.0	Startup
