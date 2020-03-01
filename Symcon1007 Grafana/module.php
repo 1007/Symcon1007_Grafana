@@ -105,18 +105,34 @@
 			// return;	
 			}
 	
+			
 		$x = 0; 
 
 		if ($data_app == "dashboard") ; 	// Manchmal fehlt dashboard
 			{
 			foreach ($d['targets'] as $target) 
 				{
+			
+				if ( isset ($target['target']) == false )
+					{
+					$this->SendDebug(__FUNCTION__, "Target is empty! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
+                	continue;
+					}	
+
                 $data_target[$x] = $target['target'];
 
                 $this->SendDebug(__FUNCTION__, "Target:".$data_target[$x], 0);
                 $x++;
             	}
-    
+	
+			// Keine Targets ?
+			if (isset($data_target) == false) 
+				{
+				$this->SendDebug(__FUNCTION__, "Alle Targets sind leer ! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
+                	
+                return;
+				}
+				
             $data_rangefrom = $d['range']['from'];
             $data_rangeto   = $d['range']['to'];
 
@@ -514,13 +530,20 @@
 		{
 		$archiv = $this->GetArchivID();
 		
+		if ( is_numeric($var) == false )
+			{
+			$this->SendDebug(__FUNCTION__,"Variable ist keine Zahl : ". $var, 0);
+			$this->Logmessage("Grafana Variable ID ".$var." Fehler !",KL_WARNING);
+			return false;	
+			}
+
 		$status = IPS_VariableExists($var);
 		
 		if ( $status == true )
 			$status = AC_GetLoggingStatus($archiv,$var);
 		
 		if ( $status == false )
-			$this->Logmessage("Grafana Variable ID ".$var." Fehler !",KL_WARNING);
+			$this->Logmessage("Grafana Variable ID ".$var." Fehler ! Wird nicht geloggt",KL_WARNING);
 			
 		return $status;
 		}
