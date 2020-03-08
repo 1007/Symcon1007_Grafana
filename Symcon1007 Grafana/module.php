@@ -96,6 +96,7 @@
 		$data_dashboardId		= @$d['dashboardId'];
 		$data_interval			= @$d['interval'];
 		$data_maxDataPoints		= @$d['maxDataPoints'];
+		
     
         
     	$this->SendDebug(__FUNCTION__,"Raw:".$data,0);
@@ -107,6 +108,7 @@
     	$this->SendDebug(__FUNCTION__,"Dashboard:".$data_dashboardId,0);
     	$this->SendDebug(__FUNCTION__,"Intervall:".$data_interval,0);
     	$this->SendDebug(__FUNCTION__,"MaxDatapoints:".$data_maxDataPoints,0);
+    	
 		
 		if (isset($data_target)) 
 			{
@@ -149,9 +151,11 @@
                 	continue;
 					}	
 
-                $data_target[$x] = $target['target'];
+				$data_target[$x] = $target['target'];
+				$data_hide[$x] = $target['hide'];
 
                 $this->SendDebug(__FUNCTION__, "Target:".$data_target[$x], 0);
+                $this->SendDebug(__FUNCTION__, "Hide:".$data_hide[$x], 0);
                 $x++;
             	}
 	
@@ -165,11 +169,14 @@
 				
             $data_rangefrom = $d['range']['from'];
             $data_rangeto   = $d['range']['to'];
+			
 
+			// if ( $data_hide == true )
+				// return;
 
             $this->SendDebug(__FUNCTION__, "From:".$data_rangefrom, 0);
             $this->SendDebug(__FUNCTION__, "To:".$data_rangeto, 0);
-
+			// $this->SendDebug(__FUNCTION__, "Hide:".$data_hide,0);
 
             $data_rangefrom = strtotime($d['range']['from']);
             $data_rangeto   = strtotime($d['range']['to']);
@@ -190,14 +197,20 @@
             $this->SendDebug(__FUNCTION__, "Startime:".$data_starttime, 0);
 
             $stringall = "";
-            foreach ($data_target as $dataID) {
+            foreach ($data_target as $key => $dataID) {
                 $pieces = explode(",", $dataID);
 
                 $ID = $pieces[0];
                 $target = @$pieces[1];
 
                 $this->SendDebug(__FUNCTION__, "Data ID:".$ID, 0);
-            
+			
+				if ($data_hide[$key] == true) 
+					{
+                    $this->SendDebug(__FUNCTION__, "Data ID: HIDE ", 0);
+						continue; 
+					}
+
                 if (isset($ID) == false) {
                     continue;
                 }
@@ -473,10 +486,17 @@
 
 		if ($aggType == 0) 
 			{
-            $letzter_Wert = AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
+			$letzter_Wert = @AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
+			
+			$array = AC_GetLoggedValues($archiv, $id, 0, 0, 1);
+			//if ( empty($array)) 
+			//	return false;
+			//$letzter_Wert = $array[0]['Value'];
             $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1)[0]['Value'];	// erster Wert vorhanden ?
 			}
 		
+			
+
 		/*
 		if ( $typ == 0 )
 			{
