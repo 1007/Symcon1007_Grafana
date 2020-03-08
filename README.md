@@ -32,7 +32,16 @@ Alle geloggten Variablen stehen automatisch in Grafana als Metrics zu Verfuegung
 Instanz hinzufuegen.
 
 ## 4. Konfiguration
-In IPSymcon ist keine Konfiguration noetig.
+Das Modul ist unter den Kerninstanzen zu finden.
+In der Konfiguration kann ein User und Passwort vergeben werden.
+Dies muss mit der Einstellung in Grafana Data Sources /JSON
+uebereinstimmen. Aktiviere unter AUTH - Basic auth.
+Siehe Bild unter Punkt 5.
+Beides ohne Authorisierung ist auch moeglich.
+Der Test im Grafana-Plugin zeigt auch dann
+"Data source is working" wenn Authorisierung fehlerhaft, weil
+nur die Verbindung getestet wird nicht die Authorisierung.
+
 
 Wer den Debug sich anschauen will, ist die Instanz in den Kerninstanzen zu finden.
 
