@@ -25,6 +25,9 @@
 		$this->SubscribeHook("/query");
 		$this->SubscribeHook("/search");
 
+		$this->RegisterPropertyString("BasicAuthUser", "");
+		$this->RegisterPropertyString("BasicAuthPassword", "");
+
 		}
 
 	//**************************************************************************
@@ -45,6 +48,33 @@
 	protected function ProcessHookData()
 		{
 		GLOBAL $_IPS;
+
+		if(!isset($_SERVER['PHP_AUTH_USER']))
+			$_SERVER['PHP_AUTH_USER'] = "";
+		if(!isset($_SERVER['PHP_AUTH_PW']))
+			$_SERVER['PHP_AUTH_PW'] = "";
+
+		$AuthUser = $this->ReadPropertyString("BasicAuthUser");	
+		$AuthPassword = $this->ReadPropertyString("BasicAuthPassword");	
+		
+		$auth = false ;
+
+		if ($_SERVER['PHP_AUTH_USER'] == $AuthUser or $_SERVER['PHP_AUTH_PW'] == $AuthPassword) 
+		    {
+            $this->SetStatus(102);
+            $auth = true;
+            }	
+			
+		$this->SendDebug(__FUNCTION__, "Grafana AUTH:".$_SERVER['PHP_AUTH_USER']."-".$_SERVER['PHP_AUTH_PW'], 0);
+        $this->SendDebug(__FUNCTION__, "Modul AUTH:".$AuthUser."-".$AuthPassword, 0);
+            
+		if ( $auth == false )
+			{
+			$this->SendDebug(__FUNCTION__, "Modul AUTH fehlerhaft!!", 0);
+			$this->SetStatus(202);
+			
+			return false;	
+			}
 
 		$data = file_get_contents("php://input");
 

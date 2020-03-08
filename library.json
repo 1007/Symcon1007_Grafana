@@ -2,11 +2,11 @@
     "id": "{170B7140-2E63-ACE1-5C6A-3B4AF5978242}",
     "author": "1007",
     "name": "Grafana",
-    "url": "",
+    "url": "https://github.com/1007/Symcon1007_Grafana",
     "compatibility": {
         "version": "5.0"
     },
-    "version": "1.0",
-    "build": 0,
-    "date": 0
+    "version": "1.1",
+    "build": 2,
+    "date": 1583566133
 }

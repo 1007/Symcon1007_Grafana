@@ -1,0 +1,31 @@
+{
+  "elements":
+  [
+
+    { "type": "Label"             , "label":  "####### Grafana 1.1 #######" },
+    
+    { "type": "Button"            , "caption": "Dokumentation", "onClick": "echo 'https://github.com/1007/Symcon1007_Grafana/tree/master/';" },
+    
+    { "type": "Label", "caption": "Basic Auth" },
+    
+    { "type": "ValidationTextBox", "name": "BasicAuthUser", "caption": "User" },
+    
+    { "type": "PasswordTextBox", "name": "BasicAuthPassword", "caption": "Passwort  " }
+
+
+  ],
+  
+
+
+  "status":
+    [
+        { "code": 101, "icon": "active", "caption": "Grafana wird erstellt..." },
+        { "code": 102, "icon": "active", "caption": "Grafana ist aktiv" },
+      
+        { "code": 202, "icon": "error",  "caption": "Userdaten falsch" }
+
+    ]
+
+
+
+}
