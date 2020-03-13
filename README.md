@@ -61,6 +61,8 @@ Grafiken in Grafana erstellen:
 - Zweiter Wert ist der Name fuer die Legende ( aenderbar)
 - URL auswaehlen fuer Webfront/IPSView unter Menuepunkt Share.
 
+[Erste Schritte mit Grafana von Attain](https://github.com/1007/Symcon1007_Grafana/blob/master/imgs/Grafana.pdf)
+
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
 gemacht werden.Die Datei defaults.ini kopieren nach custom.ini oder grafana.ini.
@@ -112,6 +114,7 @@ Entsprechend die mygrafana.css erstellen und folgendes eintragen.
 ## 7. Changelog
 
 Version 1.0	Startup
+Version 1.1 Verschiedene Fehler behoben. Doku verbessert.
 
 ## 8. ToDoListe
 Aggregationsstufen optimieren.
