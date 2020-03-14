@@ -225,7 +225,7 @@
 
                 // Archivdaten fuer eine Variable holen
                 $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
-                
+                // print_r($data);
                 $count = count($data);
                 $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
 
@@ -507,7 +507,14 @@
 		
 			}
 		*/	
-			
+		if ( $letzter_Wert == false ) // noch keine Daten geloggt/aktuellen Wert nehmen
+			{
+			$letzter_Wert = GetValue($id);
+			$s = "Noch keine Daten geloggt aktueller Wert :".$letzter_Wert;
+			$this->SendDebug(__FUNCTION__,$s,0);
+				
+
+			}	
 		$s = "Erster Wert:".$erster_Wert." - Letzter Wert:".$letzter_Wert;
 		$this->SendDebug(__FUNCTION__,$s,0);
 
