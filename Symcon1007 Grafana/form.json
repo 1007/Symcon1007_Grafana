@@ -2,7 +2,7 @@
   "elements":
   [
 
-    { "type": "Label"             , "label":  "####### Grafana 1.1 #######" },
+    { "type": "Label"             , "label":  "####### Grafana 1.2 #######" },
     
     { "type": "Button"            , "caption": "Dokumentation", "onClick": "echo 'https://github.com/1007/Symcon1007_Grafana/tree/master/';" },
     

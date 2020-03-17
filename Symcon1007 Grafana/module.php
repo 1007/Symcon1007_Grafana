@@ -20,15 +20,39 @@
 		{
 		//Never delete this line!
 		parent::Create();
-
-		$this->SubscribeHook("");
-		$this->SubscribeHook("/query");
-		$this->SubscribeHook("/search");
+		
+		
 
 		$this->RegisterPropertyString("BasicAuthUser", "");
 		$this->RegisterPropertyString("BasicAuthPassword", "");
+		
+		// Inspired by module SymconTest/HookServe
+        // We need to call the RegisterHook function on Kernel READY
+        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
 
 		}
+
+	//**************************************************************************
+	// Inspired by module SymconTest/HookServe
+	//**************************************************************************    
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        parent::MessageSink($TimeStamp, $SenderID, $Message, $Data);
+
+        if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) 
+        	{
+        	$this->LogMessage("GRAFANA KR_Ready", KL_WARNING);	
+            
+			$this->SubscribeHook("");
+			$this->SubscribeHook("/query");
+			$this->SubscribeHook("/search");
+
+            
+            
+        	}
+    }
+
+
 
 	//**************************************************************************
 	//
