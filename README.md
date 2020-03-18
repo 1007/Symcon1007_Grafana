@@ -62,6 +62,7 @@ Grafiken in Grafana erstellen:
 - URL auswaehlen fuer Webfront/IPSView unter Menuepunkt Share.
 
 [Erste Schritte mit Grafana von Attain](https://github.com/1007/Symcon1007_Grafana/blob/master/imgs/Grafana.pdf)
+[Mischen Grafiktypen](https://github.com/1007/Symcon1007_Grafana/blob/master/imgs/Mischen%20von%20Grafiktypen.pdf)
 
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
