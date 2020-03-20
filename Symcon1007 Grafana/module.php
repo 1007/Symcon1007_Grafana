@@ -21,15 +21,19 @@
 		//Never delete this line!
 		parent::Create();
 		
-		
-
 		$this->RegisterPropertyString("BasicAuthUser", "");
 		$this->RegisterPropertyString("BasicAuthPassword", "");
 		
-		// Inspired by module SymconTest/HookServe
-        // We need to call the RegisterHook function on Kernel READY
-        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
-
+		$runlevel = IPS_GetKernelRunlevel();
+		if ( $runlevel == KR_READY )
+			{
+			$this->CreateHooks();
+			}
+		else
+			{
+            $this->RegisterMessage(0, IPS_KERNELMESSAGE);
+			}
+				
 		}
 
 	//**************************************************************************
@@ -41,18 +45,12 @@
 
         if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) 
         	{
-        	$this->LogMessage("GRAFANA KR_Ready", KL_WARNING);	
-            
-			$this->SubscribeHook("");
-			$this->SubscribeHook("/query");
-			$this->SubscribeHook("/search");
-
-            
-            
+        	$this->LogMessage("GRAFANA KR_Ready", KL_MESSAGE);	
+            $this->CreateHooks();
+			
         	}
-    }
-
-
+	
+	}
 
 	//**************************************************************************
 	//
@@ -65,6 +63,20 @@
 		$this->SetStatus(102);
 
 		}
+
+	//**************************************************************************
+	// Hooks erstellen
+	//**************************************************************************
+	protected function CreateHooks()
+		{
+
+		$this->LogMessage("GRAFANA: Create Hooks", KL_MESSAGE);	
+	
+		$this->SubscribeHook("");
+		$this->SubscribeHook("/query");
+		$this->SubscribeHook("/search");
+
+        }	
 
 	//**************************************************************************
 	// Hook Data auswerten
