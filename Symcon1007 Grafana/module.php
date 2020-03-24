@@ -189,6 +189,9 @@
 
 				$data_target[$x] = $target['target'];
 				$data_hide[$x] = $target['hide'];
+				$data_data[$x] = $target['data'];
+
+				// print_r($data_data);
 
                 $this->SendDebug(__FUNCTION__, "Target:".$data_target[$x], 0);
                 $this->SendDebug(__FUNCTION__, "Hide:".$data_hide[$x], 0);
@@ -210,16 +213,16 @@
 			// if ( $data_hide == true )
 				// return;
 
-            $this->SendDebug(__FUNCTION__, "From:".$data_rangefrom, 0);
-            $this->SendDebug(__FUNCTION__, "To:".$data_rangeto, 0);
+            // $this->SendDebug(__FUNCTION__, "From:".$data_rangefrom, 0);
+            // $this->SendDebug(__FUNCTION__, "To:".$data_rangeto, 0);
 			// $this->SendDebug(__FUNCTION__, "Hide:".$data_hide,0);
 
             $data_rangefrom = strtotime($d['range']['from']);
             $data_rangeto   = strtotime($d['range']['to']);
 
 
-            $this->SendDebug(__FUNCTION__, "From:".$this->TimestampToDate($data_rangefrom), 0);
-            $this->SendDebug(__FUNCTION__, "To:".$this->TimestampToDate($data_rangeto), 0);
+            $this->SendDebug(__FUNCTION__, "From-:".$this->TimestampToDate($data_rangefrom), 0);
+            $this->SendDebug(__FUNCTION__, "To------:".$this->TimestampToDate($data_rangeto), 0);
 
 			
 
@@ -233,7 +236,10 @@
             $this->SendDebug(__FUNCTION__, "Startime:".$data_starttime, 0);
 
             $stringall = "";
-            foreach ($data_target as $key => $dataID) {
+			$loop = 0;
+
+			foreach ($data_target as $key => $dataID) 
+				{
                 $pieces = explode(",", $dataID);
 
                 $ID = $pieces[0];
@@ -244,8 +250,20 @@
 				if ($data_hide[$key] == true) 
 					{
                     $this->SendDebug(__FUNCTION__, "Data ID: HIDE ", 0);
-						continue; 
+					continue; 
 					}
+
+				$data_additional = false ;	
+				if ($data_data[$key] == true) 
+					{
+					$data_additional = $data_data[$key];
+					$add = 	$data_additional['value'];
+					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);
+					
+					
+					}
+	
+
 
                 if (isset($ID) == false) {
                     continue;
@@ -281,8 +299,10 @@
 
 					}
 
+
+
                 if ($count > 0) {
-                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe);
+                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional);
                     $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
 
                     $stringall = $stringall . "" .$string ;
@@ -425,31 +445,64 @@
 	//******************************************************************************
 	//	Rueckgabewerte fuer eine Variable erstellen
 	//******************************************************************************
-	protected function CreateReturnString($data,$target,$typ,$agstufe)
+	protected function CreateReturnString($data,$target,$typ,$agstufe,$data_data)
 		{
 		
+		$offset = 0;	
+		if ( isset($data_data['additional']) == true )
+			if ( $data_data['additional'] == 'yoffset' )
+				if ( isset($data_data['value']) == true )
+					{
+					$offset = floatval($data_data['value']);
+					$s = "Offsetwert:".$offset;
+					$this->SendDebug(__FUNCTION__,$s,0);
+
+					}	
+		
+		//$offset = 0;
+
 		$string = '{"target":"'.$target.'","datapoints":[';
 			
 		foreach($data as $value)	
 			{
 			
+			// Kein Offset zZ bei nicht Booleans
+			if ($agstufe == 99) 
+				{
+                $v = str_replace(",", ".", $value['Value']);
 			
-			if ( $agstufe == 99 )	
-				$v = str_replace(",",".",$value['Value']);
+				}		
 			else
 				{
 				$v = str_replace(",",".",$value['Avg']);		
+			
 				}	
 
 			if ( $typ == 0 )	// Boolean	
 				{
-				if ( $v == true )
+				if ($v == true) 
+					{
 					$v = 1;
+					$vorher = $v;
+					$v = $v + $offset;
+					
+					$s = "V + True Offset vorher nachher :".$vorher. "-" . $v;
+					//$this->SendDebug(__FUNCTION__,$s,0);
+					$v = str_replace(",", ".", $v);
+					}
 				else
-					$v = 0;	
+					{
+					$v = 0;
+					$vorher = $v;
 
+					$v = $v + $offset;
+					$s = "V + False Offset vorher nachher :".$vorher. "-" . $v;
+					// $this->SendDebug(__FUNCTION__,$s,0);
+					$v = str_replace(",", ".", $v);
+					}	
 				}
 
+			
 			$t = $this->TimestampToGrafanaTime($value['TimeStamp']);	
 			$string = $string ."[" .$v.",".$t."],";		
 
@@ -495,14 +548,7 @@
 			$werte = AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
 			}	
 
-			/* 
-			foreach($werte as $wert )
-			{
-				IPS_Logmessage(__CLASS__,$wert['Avg']);
-
-
-			}
-			*/ 
+			
 
 		$reversed = array_reverse($werte);
 		
@@ -525,53 +571,60 @@
 			$letzter_Wert = @AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
 			
 			$array = AC_GetLoggedValues($archiv, $id, 0, 0, 1);
-			//if ( empty($array)) 
-			//	return false;
-			//$letzter_Wert = $array[0]['Value'];
-            $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1)[0]['Value'];	// erster Wert vorhanden ?
+			
+            $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1);	// erster Wert vorhanden ?
+			
+			if ( $erster_Wert != false )
+				{
+				$erster_Wert = $erster_Wert[0]['Value'];
+				$erster_WertOK = true;
+				}
+			else
+				{
+				
+				$erster_WertOK = false;
+				}		
+				
 			}
 		
 			
-
-		/*
-		if ( $typ == 0 )
-			{
-			if ( $erster_Wert == true)
-				$erster_Wert = 1;
-			else
-				$erster_Wert = 0;	
-		
-			}
-		*/	
 		if ( $letzter_Wert == false ) // noch keine Daten geloggt/aktuellen Wert nehmen
 			{
 			$letzter_Wert = GetValue($id);
-			$s = "Noch keine Daten geloggt aktueller Wert :".$letzter_Wert;
+			$s = "Noch keine Daten geloggt aktueller Wert :".$letzter_Wert. " ID:".$id;
 			$this->SendDebug(__FUNCTION__,$s,0);
-				
-
 			}	
-		$s = "Erster Wert:".$erster_Wert." - Letzter Wert:".$letzter_Wert;
+
+		$s = "Erster Wert:[".$erster_Wert."] - Letzter Wert:[".$letzter_Wert."]";
 		$this->SendDebug(__FUNCTION__,$s,0);
 
 
 		if ($aggType == 0)	// Bei Zaehler keine erster/letzter Wert wegen komischer Anzeige (kleine Balken)
 			{
             // Damit Graph bis zum Ende geht
-            if ($agstufe == 99) {
+			if ($agstufe == 99)
+				{
                 array_push($reversed, array("TimeStamp"=>$to,"Value"=>$letzter_Wert));
-            } else {
+				} 
+			else 
+				{
                 array_push($reversed, array("TimeStamp"=>$to,"Avg"=>$letzter_Wert));
-            }
+            	}
         
-            // Damit Graph bis zum Anfang geht
-            if ($erster_Wert != false) {
-                if ($agstufe == 99) {
+            // Damit Graph bis zum Anfang geht ( $erster_Wert kann aber false sein !)
+			if ($erster_WertOK != false) 
+				{
+				if ($agstufe == 99) 
+					{
                     array_unshift($reversed, array("TimeStamp"=>$from,"Value"=>$erster_Wert));
-                } else {
+					} 
+				else
+					{
                     array_unshift($reversed, array("TimeStamp"=>$from,"Avg"=>$erster_Wert));
-                }
-            }
+					}
+					
+				}
+				
         	}		
 
 		return $reversed;
