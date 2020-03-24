@@ -581,7 +581,7 @@
 				}
 			else
 				{
-				
+				$erster_Wert = false; 
 				$erster_WertOK = false;
 				}		
 				
