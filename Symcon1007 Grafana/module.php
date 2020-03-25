@@ -424,9 +424,9 @@
 				$status = AC_GetLoggingStatus($archiv,$var);
 				if ( $status == true )
 					{
-					$name = IPS_GetName($var);
+					$name = addslashes(IPS_GetName($var));
 					$parent = IPS_GetParent($var);
-					$parent = IPS_GetName($parent);	
+					$parent = addslashes(IPS_GetName($parent));	
 					$metrics = $var.",".$name."[".$parent."]";
 
 					$string = $string .'"'.$metrics.'",';	
@@ -574,6 +574,7 @@
 			
             $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1);	// erster Wert vorhanden ?
 			
+			// Wenn es im Zeitbereich keinen ersten Wert gibt dann auf FALSE
 			if ( $erster_Wert != false )
 				{
 				$erster_Wert = $erster_Wert[0]['Value'];
