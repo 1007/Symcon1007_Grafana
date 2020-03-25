@@ -460,7 +460,8 @@
 					}	
 		
 		//$offset = 0;
-
+		$target = addslashes($target);
+					
 		$string = '{"target":"'.$target.'","datapoints":[';
 			
 		foreach($data as $value)	
