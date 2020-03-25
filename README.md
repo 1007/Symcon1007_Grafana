@@ -88,6 +88,14 @@ Nach:
 
 Neustart nicht vergessen
 
+Wer Chrome ab Version 80 einsetzt und sich nicht einloggen kann, soll
+mal folgenden Eintrag in der Konfiguration ueberpruefen:
+
+	set cookie SameSite attribute. defaults to 'lax'. can be set to "lax", "strict", "none" and "disabled"
+	cookie_samesite = none
+none funktioniert nicht mehr. Den Defaultwert 'lax' benutzen.
+
+
 
 Wenn ihr in der Userverwaltung User nur mit Login habt.
 Dann kommt im Webfront/IPSView einmalig ein Anmeldebildschirm.
@@ -104,7 +112,7 @@ In die index.html folgende Zeile einfuegen
 Entsprechend die mygrafana.css erstellen und folgendes eintragen.
 
 	@charset "UTF-8";
-
+	
 	.panel-container {
 	background-color: #xxxxxx !important;
 	border: 0px solid #FFFFFF !important;
