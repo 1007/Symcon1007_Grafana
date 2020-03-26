@@ -178,6 +178,14 @@
 
 		if ($data_app == "dashboard") ; 	// Manchmal fehlt dashboard
 			{
+			
+			// bei Aufruf durch Browser Meldung ausgeben
+			if ( isset($d['targets']) == false )
+				{
+				echo "Aufruf im Browser wird nicht unterstuetzt";
+				return false;	
+				}
+
 			foreach ($d['targets'] as $target) 
 				{
 			
@@ -459,9 +467,11 @@
 
 					}	
 		
-		//$offset = 0;
+
+
+		
 		$target = addslashes($target);
-					
+
 		$string = '{"target":"'.$target.'","datapoints":[';
 			
 		foreach($data as $value)	
