@@ -68,16 +68,18 @@ Grafiken in Grafana erstellen:
 Optionale Einstellungen der Aggregationstufen:
 Fuer jeden Graph kann neben dem Feld "Metric" 
 das Feld "Additional JSON Data" benutzt werden.
-Dort kann eine Aggregationstufe fest vorgegeben werden.
+Dort kann eine Aggregationstufe , als JSON String ,
+fest vorgegeben werden.
 ![Additional JSON Data](imgs/JSON.png?raw=true "Additional JSON Data")
-	//	Stufe 0		Stuendliche Aggregation
-	//	Stufe 1		Taegliche Aggregation
-	//	Stufe 2		Woechentliche Aggregation
-	//	Stufe 3		Monatliche Aggregation
-	//	Stufe 4		Jaehrliche Aggregation
-	//	Stufe 5		5-Minuetige Aggregation
-	//	Stufe 6		1-Minuetige Aggregation
-	//	Stufe 99	keine Aggregation ( maximale Aufloesung )
+
+- Stufe 0		Stuendliche Aggregation
+- Stufe 1		Taegliche Aggregation
+- Stufe 2		Woechentliche Aggregation
+- Stufe 3		Monatliche Aggregation
+- Stufe 4		Jaehrliche Aggregation
+- Stufe 5		5-Minuetige Aggregation
+- Stufe 6		1-Minuetige Aggregation
+- Stufe 99	keine Aggregation ( maximale Aufloesung )
 
 
 
