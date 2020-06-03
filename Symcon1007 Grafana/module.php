@@ -95,7 +95,7 @@
 		
 		$auth = false ;
 
-		if ($_SERVER['PHP_AUTH_USER'] == $AuthUser or $_SERVER['PHP_AUTH_PW'] == $AuthPassword) 
+		if ($_SERVER['PHP_AUTH_USER'] == $AuthUser and $_SERVER['PHP_AUTH_PW'] == $AuthPassword) 
 		    {
             $this->SetStatus(102);
             $auth = true;
@@ -246,6 +246,10 @@
             $stringall = "";
 			$loop = 0;
 
+			/*
+			// ************** Stopuhr Start
+			$microtimestart = microtime(true);
+
 			foreach ($data_target as $key => $dataID) 
 				{
                 $pieces = explode(",", $dataID);
@@ -266,57 +270,191 @@
 					{
 					$data_additional = $data_data[$key];
 					$add = 	$data_additional['value'];
-					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);
-					
-					
+					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);			
 					}
 	
-
-
-                if (isset($ID) == false) {
+				if (isset($ID) == false) 
+					{
                     continue;
-                }
-                if ($this->CheckVariable($ID) == false) {
+					}
+				
+				// checken ob exist und geloggt	
+				if ($this->CheckVariable($ID) == false) 
+					{
                     continue;
-                }
+                	}
 			   
 				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID);
 
                 $array = IPS_GetVariable($ID);
                 $typ = $array['VariableType'];
 
-                // Archivdaten fuer eine Variable holen
+				// Archivdaten fuer eine Variable holen
                 $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
                 // print_r($data);
                 $count = count($data);
                 $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
 
-				if( $count > 9999 )		// Maximale Anzahl Daten erreicht
+				$RecordLimit = 9999;
+				$RecordLimit = IPS_GetOption('ArchiveRecordLimit') - 1 ;
+
+				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
 					{
 					if ( $agstufe == 99 )
 						$agstufe = 0;
 					else 
 						$agstufe = $agstufe +1;
+					
 					if( $agstufe > 5)
 						$agstufe = 5;
 						
 					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
-                
 					$count = count($data);
 					$this->SendDebug(__FUNCTION__, "2. Versuch Data Count:".$count, 0);
 
 					}
 
+                 // print_r($data);
 
-
-                if ($count > 0) {
+				if ($count > 0) 
+					{
                     $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional);
                     $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
 
                     $stringall = $stringall . "" .$string ;
-                };
+					};
+					
+
             }
-            
+			
+			// *************** Stoppuhr Ende
+			$microtimesende = microtime(true);
+			$microtime = $microtimesende - $microtimestart;
+			$this->SendDebug(__FUNCTION__, "Microtime :".$microtime, 0);
+			*/
+
+			// Beginn neue Version
+			// ************** Stopuhr Start
+			// microtime nicht auf allen Systemen
+			// $microtimestart = microtime(true);
+
+			foreach ($data_target as $key => $dataID) 
+				{
+                $pieces = explode(",", $dataID);
+
+                $ID = $pieces[0];
+                $target = @$pieces[1];
+
+                $this->SendDebug(__FUNCTION__, "Data ID:".$ID, 0);
+			
+				if ($data_hide[$key] == true) 
+					{
+                    $this->SendDebug(__FUNCTION__, "Data ID: HIDE ", 0);
+					continue; 
+					}
+
+				$data_additional = false ;
+				$add = -1;	// 0 nicht moeglich
+				if ($data_data[$key] == true) 
+					{
+					$data_additional = $data_data[$key];
+					if ( isset($data_additional['Aggregationsstufe']) == false )
+						$add = -1;
+					else	 
+						$add = 	$data_additional['Aggregationsstufe'];
+					
+					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);			
+					}
+	
+				if (isset($ID) == false) 
+					{
+                    continue;
+					}
+				
+				// checken ob exist und geloggt	
+				if ($this->CheckVariable($ID) == false) 
+					{
+                    continue;
+                	}
+			   
+				$array = IPS_GetVariable($ID);
+				$typ = $array['VariableType'];
+
+				$RecordLimit = 9999;
+				$RecordLimit = IPS_GetOption('ArchiveRecordLimit') - 1 ;
+
+				// Besser hier, da fuer jeden Graph eigene Stufe
+				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID,$add);
+				// $agstufe = 99; // Versuch 1
+
+				// Archivdaten fuer eine Variable holen
+                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);                
+                $count = count($data);
+                $this->SendDebug(__FUNCTION__, "1. Versuch Data Count:".$count, 0);
+
+				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
+					{	
+					$agstufe = 6; // 1 minuetig		
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					if ( $data == false )
+						$counts = "Fehler";
+					else
+						$count = count($data);
+					$this->SendDebug(__FUNCTION__, "2. Versuch Data Count:".$count, 0);
+					}
+
+				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
+					{	
+					$agstufe = 5; // 5 minuetig	Problem !!!	
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					if ( $data == false )
+						$counts = "Fehler";
+					else
+						$count = count($data);
+					$this->SendDebug(__FUNCTION__, "3. Versuch Data Count:".$count, 0);
+					}
+                 
+				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
+					{	
+					$agstufe = 0; // stuendlich		
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$count = count($data);
+					$this->SendDebug(__FUNCTION__, "4. Versuch Data Count:".$count, 0);
+					}
+
+				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
+					{	
+					$agstufe = 1; // taeglich		
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$count = count($data);
+					$this->SendDebug(__FUNCTION__, "5. Versuch Data Count:".$count, 0);
+					}
+
+
+				if ($count > 0) 
+					{
+                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional);
+                    $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
+
+                    $stringall = $stringall . "" .$string ;
+					};
+					
+
+            }
+
+
+
+
+
+
+
+
+			// *************** Stoppuhr Ende
+			// $microtimesende = microtime(true);
+			// $microtime = $microtimesende - $microtimestart;
+			// $this->SendDebug(__FUNCTION__, "Microtime :".$microtime, 0);
+			// Ende neue Version
+
             $string = $this->CreateHeaderReturnString($stringall);
 
             $this->SendDebug(__FUNCTION__, "Data String ALL :".$string, 0);
@@ -364,6 +502,7 @@
 		
 	//******************************************************************************
 	// 	Aggregationsstufe fuer Zeitraeume festlegen
+	//  Stufe -1    kein Additional JSON Data uebergeben
 	//	Stufe 0		Stuendliche Aggregation
 	// 	Stufe 1		Taegliche Aggregation
 	// 	Stufe 2		Woechentliche Aggregation
@@ -371,9 +510,9 @@
 	//  Stufe 4		Jaehrliche Aggregation
 	//  Stufe 5		5-Minuetige Aggregation
 	//  Stufe 6		1-Minuetige Aggregation
-	// 	Stufe 99	keine Aggregation 
+	// 	Stufe 99	keine Aggregation ( maximale Aufloesung mit mehreren Vesuchen )
 	//******************************************************************************	
-	protected function CheckZeitraumForAggregatedValues($from,$to,$varID)
+	protected function CheckZeitraumForAggregatedValues($from,$to,$varID,$add)
 		{
 		$archiv = $this->GetArchivID();
 		$aggType = AC_GetAggregationType($archiv,$varID);
@@ -383,7 +522,7 @@
 		$days = ($to-$from)/(3600*24);	
 		$hours = ($to-$from)/(3600);
 
-		if ($aggType == 0) 
+		if ($aggType == 0) 		// Standard bei -1
 			{
 			if ($days > 7) 
 				{
@@ -395,8 +534,7 @@
             	}
 			}
 
-		
-		if ($aggType == 1) 
+		if ($aggType == 1) 		// Zaehler bei -1
 			{
 			$stufe = 0;	
 			if ( $hours < 2 )
@@ -406,10 +544,16 @@
 				$stufe = 1;	
 			if( $days > 30 )
 				$stufe = 2;		
-			
 			}
-				
-		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
+		
+		// $add hat Vorrang vor Standard ( -1 )
+		if ($add >= 0 and $add <= 6 )
+			$stufe = $add;			
+		if ($add == 99 )
+			$stufe = $add;			
+		
+			
+		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType. " Additional JSON:".$add;
 
 		$this->SendDebug(__FUNCTION__,$s,0);
 
@@ -476,9 +620,13 @@
 			
 		foreach($data as $value)	
 			{
-			
+			 
+							
 			// Kein Offset zZ bei nicht Booleans
-			if ($agstufe == 99) 
+			// if ($agstufe == 99) 
+
+			if (isset($value['Value'])) 
+
 				{
                 $v = str_replace(",", ".", $value['Value']);
 			
@@ -498,7 +646,7 @@
 					$v = $v + $offset;
 					
 					$s = "V + True Offset vorher nachher :".$vorher. "-" . $v;
-					//$this->SendDebug(__FUNCTION__,$s,0);
+					$this->SendDebug(__FUNCTION__,$s,0);
 					$v = str_replace(",", ".", $v);
 					}
 				else
@@ -508,7 +656,7 @@
 
 					$v = $v + $offset;
 					$s = "V + False Offset vorher nachher :".$vorher. "-" . $v;
-					// $this->SendDebug(__FUNCTION__,$s,0);
+					$this->SendDebug(__FUNCTION__,$s,0);
 					$v = str_replace(",", ".", $v);
 					}	
 				}
@@ -545,6 +693,8 @@
 	//******************************************************************************
 	protected function GetArchivData($id,$from,$to,$agstufe,$typ)
 		{
+		
+		// $agstufe = 1;
 
 		$werte = array();
 
@@ -552,14 +702,22 @@
 		$aggType = AC_GetAggregationType($archiv,$id);
 
 
-		if ( $agstufe == 99)
-			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0); 
+		if ($agstufe == 99) 
+			{
+			$s = "GetloggedValues".$archiv."-".$id."-".$from."-".$to;	
+			$this->SendDebug(__FUNCTION__,$s,0);
+			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0);
+			// print_r($werte);
+			}
 		else
 			{
-			$werte = AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
+			$s = "GetAggregatedValues:".$agstufe."-".$archiv."-".$id."-".$from."-".$to;	
+			$this->SendDebug(__FUNCTION__,$s,0);
+			$werte = @AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
 			}	
 
-			
+		if ( is_array($werte) == false )
+			return false;
 
 		$reversed = array_reverse($werte);
 		
@@ -697,11 +855,14 @@
 
 		$status = IPS_VariableExists($var);
 		
+		// rausgenommen,wenn nicht geloggt wird letzter Wert genommen (Gauge)
+		/*
 		if ( $status == true )
 			$status = AC_GetLoggingStatus($archiv,$var);
 		
 		if ( $status == false )
 			$this->Logmessage("Grafana Variable ID ".$var." Fehler ! Wird nicht geloggt",KL_WARNING);
+		*/ 
 			
 		return $status;
 		}

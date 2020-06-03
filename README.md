@@ -65,6 +65,22 @@ Grafiken in Grafana erstellen:
 
 [Mischen Grafiktypen](https://github.com/1007/Symcon1007_Grafana/blob/master/imgs/Mischen%20von%20Grafiktypen.pdf)
 
+Optionale Einstellungen der Aggregationstufen:
+Fuer jeden Graph kann neben dem Feld "Metric" 
+das Feld "Additional JSON Data" benutzt werden.
+Dort kann eine Aggregationstufe fest vorgegeben werden.
+![Additional JSON Data](imgs/JSON.png?raw=true "Additional JSON Data")
+	//	Stufe 0		Stuendliche Aggregation
+	//	Stufe 1		Taegliche Aggregation
+	//	Stufe 2		Woechentliche Aggregation
+	//	Stufe 3		Monatliche Aggregation
+	//	Stufe 4		Jaehrliche Aggregation
+	//	Stufe 5		5-Minuetige Aggregation
+	//	Stufe 6		1-Minuetige Aggregation
+	//	Stufe 99	keine Aggregation ( maximale Aufloesung )
+
+
+
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
 gemacht werden.Die Datei defaults.ini kopieren nach custom.ini oder grafana.ini.
