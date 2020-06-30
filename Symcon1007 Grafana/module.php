@@ -99,7 +99,11 @@
 		    {
             $this->SetStatus(102);
             $auth = true;
-            }	
+			}	
+		else
+			{
+			$this->SetStatus(202);
+			}	
 			
 		$this->SendDebug(__FUNCTION__, "Grafana AUTH:".$_SERVER['PHP_AUTH_USER']."-".$_SERVER['PHP_AUTH_PW'], 0);
         $this->SendDebug(__FUNCTION__, "Modul AUTH:".$AuthUser."-".$AuthPassword, 0);
@@ -228,7 +232,10 @@
             $data_rangefrom = strtotime($d['range']['from']);
             $data_rangeto   = strtotime($d['range']['to']);
 
-
+			// Endzeit liegt in der Zukunft
+			if ( $data_rangeto > time() )
+				$data_rangeto = time();
+			
             $this->SendDebug(__FUNCTION__, "From-:".$this->TimestampToDate($data_rangefrom), 0);
             $this->SendDebug(__FUNCTION__, "To------:".$this->TimestampToDate($data_rangeto), 0);
 
@@ -368,7 +375,8 @@
 	
 				if (isset($ID) == false) 
 					{
-                    continue;
+					continue;
+					
 					}
 				
 				// checken ob exist und geloggt	
