@@ -584,7 +584,7 @@
 				$status = AC_GetLoggingStatus($archiv,$var);
 				if ( $status == true )
 					{
-					// $name = addslashes(IPS_GetName($var));
+					
 					$name = IPS_GetName($var);
 					$name = str_replace("'",'"',$name);
 					$name = addslashes($name);
@@ -707,11 +707,12 @@
 	protected function GetArchivData($id,$from,$to,$agstufe,$typ)
 		{
 		
-		// $agstufe = 1;
-
 		$werte = array();
 
 		$archiv = $this->GetArchivID();
+
+		// 0 = Standard
+		// 1 = Zaehler
 		$aggType = AC_GetAggregationType($archiv,$id);
 
 
@@ -736,9 +737,6 @@
 		
 		$count = count($werte);
 		
-
-		
-		
 		if ( $aggType ==1 )
 		{
 		 // Neuesten Wert loeschen.Wegen Anzeige.Werte sind noch nicht komplett
@@ -750,7 +748,11 @@
 
 		if ($aggType == 0) 
 			{
-			$letzter_Wert = @AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
+			// Problem da aktueller Wert genommen wird ( Gestern )	
+			// $letzter_Wert = @AC_GetLoggedValues($archiv, $id, 0, 0, 1)[0]['Value'];
+			// $to Zeit nehmen fuer letzten Wert
+			$letzter_Wert = @AC_GetLoggedValues($archiv, $id, 0, $to, 1)[0]['Value'];
+			
 			
 			$array = AC_GetLoggedValues($archiv, $id, 0, 0, 1);
 			
