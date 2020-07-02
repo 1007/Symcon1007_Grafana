@@ -584,9 +584,14 @@
 				$status = AC_GetLoggingStatus($archiv,$var);
 				if ( $status == true )
 					{
-					$name = addslashes(IPS_GetName($var));
+					// $name = addslashes(IPS_GetName($var));
+					$name = IPS_GetName($var);
+					$name = str_replace("'",'"',$name);
+					$name = addslashes($name);
 					$parent = IPS_GetParent($var);
-					$parent = addslashes(IPS_GetName($parent));	
+					$parent = IPS_GetName($parent);
+					$parent = str_replace("'",'"',$parent);
+					$parent = addslashes($parent);	
 					$metrics = $var.",".$name."[".$parent."]";
 
 					$string = $string .'"'.$metrics.'",';	
