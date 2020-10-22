@@ -200,12 +200,23 @@
 					}	
 
 				$data_target[$x] = $target['target'];
-				$data_hide[$x] = $target['hide'];
-				$data_data[$x] = $target['data'];
 
-				// print_r($data_data);
 
-                $this->SendDebug(__FUNCTION__, "Target:".$data_target[$x], 0);
+				if ( isset($target['hide']) == false )
+					{
+					$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target Hide is empty! ", 0);
+					$data_hide[$x] = false ;
+					}
+				else
+					{
+					$data_hide[$x] = $target['hide'];
+					}
+				
+				$data_data[$x] = $target['data'];	// Additional Data
+
+				
+
+                $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target:".$data_target[$x], 0);
                 $this->SendDebug(__FUNCTION__, "Hide:".$data_hide[$x], 0);
                 $x++;
             	}
@@ -236,8 +247,8 @@
 			if ( $data_rangeto > time() )
 				$data_rangeto = time();
 			
-            $this->SendDebug(__FUNCTION__, "From-:".$this->TimestampToDate($data_rangefrom), 0);
-            $this->SendDebug(__FUNCTION__, "To------:".$this->TimestampToDate($data_rangeto), 0);
+            $this->SendDebug(__FUNCTION__, "From:".$this->TimestampToDate($data_rangefrom), 0);
+            $this->SendDebug(__FUNCTION__, "To:".$this->TimestampToDate($data_rangeto), 0);
 
 			
 
@@ -253,93 +264,7 @@
             $stringall = "";
 			$loop = 0;
 
-			/*
-			// ************** Stopuhr Start
-			$microtimestart = microtime(true);
-
-			foreach ($data_target as $key => $dataID) 
-				{
-                $pieces = explode(",", $dataID);
-
-                $ID = $pieces[0];
-                $target = @$pieces[1];
-
-                $this->SendDebug(__FUNCTION__, "Data ID:".$ID, 0);
 			
-				if ($data_hide[$key] == true) 
-					{
-                    $this->SendDebug(__FUNCTION__, "Data ID: HIDE ", 0);
-					continue; 
-					}
-
-				$data_additional = false ;	
-				if ($data_data[$key] == true) 
-					{
-					$data_additional = $data_data[$key];
-					$add = 	$data_additional['value'];
-					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);			
-					}
-	
-				if (isset($ID) == false) 
-					{
-                    continue;
-					}
-				
-				// checken ob exist und geloggt	
-				if ($this->CheckVariable($ID) == false) 
-					{
-                    continue;
-                	}
-			   
-				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID);
-
-                $array = IPS_GetVariable($ID);
-                $typ = $array['VariableType'];
-
-				// Archivdaten fuer eine Variable holen
-                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
-                // print_r($data);
-                $count = count($data);
-                $this->SendDebug(__FUNCTION__, "Data Count:".$count, 0);
-
-				$RecordLimit = 9999;
-				$RecordLimit = IPS_GetOption('ArchiveRecordLimit') - 1 ;
-
-				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
-					{
-					if ( $agstufe == 99 )
-						$agstufe = 0;
-					else 
-						$agstufe = $agstufe +1;
-					
-					if( $agstufe > 5)
-						$agstufe = 5;
-						
-					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
-					$count = count($data);
-					$this->SendDebug(__FUNCTION__, "2. Versuch Data Count:".$count, 0);
-
-					}
-
-                 // print_r($data);
-
-				if ($count > 0) 
-					{
-                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional);
-                    $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
-
-                    $stringall = $stringall . "" .$string ;
-					};
-					
-
-            }
-			
-			// *************** Stoppuhr Ende
-			$microtimesende = microtime(true);
-			$microtime = $microtimesende - $microtimestart;
-			$this->SendDebug(__FUNCTION__, "Microtime :".$microtime, 0);
-			*/
-
 			// Beginn neue Version
 			// ************** Stopuhr Start
 			// microtime nicht auf allen Systemen
@@ -360,23 +285,22 @@
 					continue; 
 					}
 
+				$additional_data = $this->GetAdditionalData($data_data[$key]);
+
+					
 				$data_additional = false ;
+				
 				$add = -1;	// 0 nicht moeglich
 				if ($data_data[$key] == true) 
 					{
 					$data_additional = $data_data[$key];
-					if ( isset($data_additional['Aggregationsstufe']) == false )
-						$add = -1;
-					else	 
-						$add = 	$data_additional['Aggregationsstufe'];
-					
-					$this->SendDebug(__FUNCTION__, "Additional Data :".$add , 0);			
+							
 					}
-	
+
+					
 				if (isset($ID) == false) 
 					{
 					continue;
-					
 					}
 				
 				// checken ob exist und geloggt	
@@ -391,12 +315,19 @@
 				$RecordLimit = 9999;
 				$RecordLimit = IPS_GetOption('ArchiveRecordLimit') - 1 ;
 
+				$AggregationsStufe = $additional_data['Aggregationsstufe'];
+
 				// Besser hier, da fuer jeden Graph eigene Stufe
-				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID,$add);
+				$agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto,$ID,$AggregationsStufe);
 				// $agstufe = 99; // Versuch 1
 
+				
 				// Archivdaten fuer eine Variable holen
-                $data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);                
+				$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);       
+				
+				if($data == FALSE)	// wird nicht geloggt
+					continue;
+				
                 $count = count($data);
                 $this->SendDebug(__FUNCTION__, "1. Versuch Data Count:".$count, 0);
 
@@ -439,9 +370,12 @@
 					}
 
 
+				$DataOffset = $additional_data['DataOffset'];
+				$TimeOffset = $additional_data['TimeOffset'];
+
 				if ($count > 0) 
 					{
-                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional);
+                    $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional,$DataOffset,$TimeOffset,$additional_data);
                     $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
 
                     $stringall = $stringall . "" .$string ;
@@ -491,6 +425,64 @@
 		}
 
 	//******************************************************************************
+	//	Additional JSON Data auswerten
+	//******************************************************************************
+	protected function GetAdditionalData($data)
+		{
+		$AdditionalData = array();
+		
+		$this->SendDebug(__FUNCTION__, "" , 0);
+
+		if ( is_array($data ) )
+		foreach ($data as $key => $value)
+			{
+            $this->SendDebug(__FUNCTION__, "Input-".$key ."[" . $value . "]", 0);
+            }	
+			
+		if ( isset($data['Aggregationsstufe']) == false )
+            $AdditionalData['Aggregationsstufe'] = -1;
+		else	 
+			$AdditionalData['Aggregationsstufe'] = 	$data['Aggregationsstufe'];	
+
+		if ( isset($data['AggregationsAvg']) == true )
+			$AdditionalData['AggregationsAvg'] = $data['AggregationsAvg'];	
+		if ( isset($data['AggregationsMin']) == true )
+			$AdditionalData['AggregationsMin'] = $data['AggregationsMin'];	
+		if ( isset($data['AggregationsMax']) == true )
+			$AdditionalData['AggregationsMax'] = $data['AggregationsMax'];	
+
+		if ( isset($data['Resolution']) == false )
+			$AdditionalData['Resolution'] = -1;
+		else	 
+			$AdditionalData['Resolution'] = $data['Resolution'];	
+
+		if ( isset($data['DataOffset']) == false )
+			$AdditionalData['DataOffset'] = 0;
+		else	 
+			$AdditionalData['DataOffset'] = $data['DataOffset'];	
+
+		if ( isset($data['TimeOffset']) == false )
+			$AdditionalData['TimeOffset'] = 0;
+		else	 
+			$AdditionalData['TimeOffset'] = $data['TimeOffset'];	
+
+		if ( isset($data['DataFilter']) == true )
+			$AdditionalData['DataFilter'] = $data['DataFilter'];
+
+			
+
+		foreach ($AdditionalData as $key => $value)
+			{
+            $this->SendDebug(__FUNCTION__, "Output-".$key ."[" . $value . "]", 0);
+            }	
+			
+
+
+		return $AdditionalData;
+
+        }	
+
+	//******************************************************************************
 	//	Teststring erstellen und senden
 	//******************************************************************************
 	protected function sendtest()
@@ -520,7 +512,7 @@
 	//  Stufe 6		1-Minuetige Aggregation
 	// 	Stufe 99	keine Aggregation ( maximale Aufloesung mit mehreren Vesuchen )
 	//******************************************************************************	
-	protected function CheckZeitraumForAggregatedValues($from,$to,$varID,$add)
+	protected function CheckZeitraumForAggregatedValues($from,$to,$varID,$AggregationsStufe)
 		{
 		$archiv = $this->GetArchivID();
 		$aggType = AC_GetAggregationType($archiv,$varID);
@@ -554,14 +546,14 @@
 				$stufe = 2;		
 			}
 		
-		// $add hat Vorrang vor Standard ( -1 )
-		if ($add >= 0 and $add <= 6 )
-			$stufe = $add;			
-		if ($add == 99 )
-			$stufe = $add;			
+		// $AggregationsStufe hat Vorrang vor Standard ( -1 )
+		if ($AggregationsStufe >= 0 and $AggregationsStufe <= 6 )
+			$stufe = $AggregationsStufe;			
+		if ($AggregationsStufe == 99 )
+			$stufe = $AggregationsStufe;			
 		
 			
-		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType. " Additional JSON:".$add;
+		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
 
 		$this->SendDebug(__FUNCTION__,$s,0);
 
@@ -610,21 +602,26 @@
 	//******************************************************************************
 	//	Rueckgabewerte fuer eine Variable erstellen
 	//******************************************************************************
-	protected function CreateReturnString($data,$target,$typ,$agstufe,$data_data)
+	protected function CreateReturnString($data,$target,$typ,$agstufe,$data_data,$DataOffset,$TimeOffset,$additional_data)
 		{
 		
-		$offset = 0;	
+		$offset = 0;
+	
+		$offset = floatval($DataOffset);
+		$s = "Offsetwert neu:".$offset;
+		$this->SendDebug(__FUNCTION__,$s,0);
+	
+		
 		if ( isset($data_data['additional']) == true )
 			if ( $data_data['additional'] == 'yoffset' )
 				if ( isset($data_data['value']) == true )
 					{
 					$offset = floatval($data_data['value']);
-					$s = "Offsetwert:".$offset;
+					$s = "Offsetwert alt:".$offset;
 					$this->SendDebug(__FUNCTION__,$s,0);
 
 					}	
-		
-
+	
 
 		
 		$target = addslashes($target);
@@ -639,18 +636,51 @@
 			// if ($agstufe == 99) 
 
 			if (isset($value['Value'])) 
+				{
+                if(isset($additional_data['DataFilter']))
+                    {
+                   $filter = $additional_data['DataFilter'];    
+ 
+                   $v = str_replace(",", ".", $value['Value']);
+                   if ( $filter > $v)   // sinvoll ?
+                        continue;
+                    }
+                else 
+                    {
+                    $v = str_replace(",",".",$value['Value']);
+                    }
+                }		
 
+           else
 				{
-                $v = str_replace(",", ".", $value['Value']);
-			
-				}		
-			else
-				{
-				$v = str_replace(",",".",$value['Avg']);		
-			
+				// Aggregation
+				// IPS_LogMessage(__FUNCTION__,"");
+
+				$min = false;
+				$max = false;
+				$avg = false;
+
+				$avg = @$value['Avg'];	
+				$min = @$value['Min'];	
+				$max = @$value['Max'];	
+				$avg = str_replace(",",".",$avg);
+				$min = str_replace(",",".",$min);
+				$max = str_replace(",",".",$max);
+				
+				$v = $avg;
+				
+				
+				if ( isset($additional_data['AggregationsMin']) == true )
+				    if ( $min != false )
+						$v = $min;
+				if ( isset($additional_data['AggregationsMax']) == true )
+					if ( $max != false )
+						$v = $max;
+						
 				}	
 
-			if ( $typ == 0 )	// Boolean	
+			// Boolean	
+			if ( $typ == 0 )		
 				{
 				if ($v == true) 
 					{
@@ -659,7 +689,7 @@
 					$v = $v + $offset;
 					
 					$s = "V + True Offset vorher nachher :".$vorher. "-" . $v;
-					$this->SendDebug(__FUNCTION__,$s,0);
+					// $this->SendDebug(__FUNCTION__,$s,0);
 					$v = str_replace(",", ".", $v);
 					}
 				else
@@ -669,13 +699,14 @@
 
 					$v = $v + $offset;
 					$s = "V + False Offset vorher nachher :".$vorher. "-" . $v;
-					$this->SendDebug(__FUNCTION__,$s,0);
+					// $this->SendDebug(__FUNCTION__,$s,0);
 					$v = str_replace(",", ".", $v);
 					}	
 				}
 
 			
-			$t = $this->TimestampToGrafanaTime($value['TimeStamp']);	
+			$Timestamp = $value['TimeStamp'] + intval($TimeOffset);	
+			$t = $this->TimestampToGrafanaTime($Timestamp);	
 			$string = $string ."[" .$v.",".$t."],";		
 
 			}
@@ -710,6 +741,16 @@
 		$werte = array();
 
 		$archiv = $this->GetArchivID();
+
+		$status = AC_GetLoggingStatus ($archiv, $id);
+		if ( $status == FALSE )
+			{
+			$s = " Variable wird nicht geloggt : ".$id;	
+			$this->SendDebug(__FUNCTION__,$s,0);
+			return FALSE;
+
+			}	
+
 
 		// 0 = Standard
 		// 1 = Zaehler
