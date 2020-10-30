@@ -569,6 +569,8 @@
 		$archiv = $this->GetArchivID();
 		$varList = IPS_GetVariableList ();
 
+		sort($varList);
+
 		$string = '[';
 
 		foreach ($varList as $var )
