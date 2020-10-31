@@ -152,7 +152,7 @@
 		
 		if (isset($data_target)) 
 			{
-            $this->SendDebug(__FUNCTION__, "Target ist gesetzt", 0);
+            $this->SendDebug(__FUNCTION__, "Target ist gesetzt [".$data_target."]", 0);
             $targetset = true;
         	}	
 		else
@@ -163,7 +163,7 @@
 
 		if ( $data_type == "timeseries" or $targetset == true)		// Request Metrics
 			{
-			$string = $this->ReturnMetrics();	
+			$string = $this->ReturnMetrics($data_target);	
 			$this->SendDebug(__FUNCTION__,"RequestMetrics:".$string,0);
 			echo $string;	
 			return;	
@@ -171,7 +171,7 @@
 
 		if ( $data_app == "explore" )		// Explore
 			{
-			$string = $this->ReturnMetrics();	
+			$string = $this->ReturnMetrics($data_target);	
 			$this->SendDebug(__FUNCTION__,"Explore:".$string,0);
 			// echo $string;	
 			// return;	
@@ -551,11 +551,10 @@
 			$stufe = $AggregationsStufe;			
 		if ($AggregationsStufe == 99 )
 			$stufe = $AggregationsStufe;			
-		
 			
 		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
 
-		$this->SendDebug(__FUNCTION__,$s,0);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 		return $stufe;
 
@@ -564,7 +563,7 @@
 	//******************************************************************************
 	//	alle geloggten Variablen an Grafana senden ( Request Metrics )
 	//******************************************************************************
-	protected function ReturnMetrics()
+	protected function ReturnMetrics($data_target)
 		{
 		$archiv = $this->GetArchivID();
 		$varList = IPS_GetVariableList ();
@@ -588,6 +587,20 @@
 					$parent = addslashes($parent);	
 					$metrics = $var.",".$name."[".$parent."]";
 
+					// Filterung der Eingabe
+					$found = stripos($metrics,$data_target);
+					if ( $found === false )
+						{
+						$s = "false";	
+						continue;
+						// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+						}	
+					else
+						{
+						$s = "true";	
+						// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+						}	
+					
 					$string = $string .'"'.$metrics.'",';	
 
 					}
