@@ -565,6 +565,10 @@
 	//******************************************************************************
 	protected function ReturnMetrics($data_target)
 		{
+			
+
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+
 		$archiv = $this->GetArchivID();
 		$varList = IPS_GetVariableList ();
 
@@ -588,19 +592,24 @@
 					$metrics = $var.",".$name."[".$parent."]";
 
 					// Filterung der Eingabe
-					$found = stripos($metrics,$data_target);
-					if ( $found === false )
+					if ( $data_target != "" )	// Kein Filter
 						{
-						$s = "false";	
-						continue;
-						// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
-						}	
-					else
-						{
-						$s = "true";	
-						// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
-						}	
-					
+						$found = stripos($metrics,$data_target);
+						if ( $found === false )
+							{
+							$s = "false";	
+							//if ( $data_target =! false )
+							continue;
+							// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+							}	
+						else
+							{
+							$s = "true";	
+							// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+							}	
+						}
+
+
 					$string = $string .'"'.$metrics.'",';	
 
 					}
