@@ -137,7 +137,12 @@
 		$data_interval			= @$d['interval'];
 		$data_maxDataPoints		= @$d['maxDataPoints'];
 		
-    
+	
+		
+		//$string = $this->ReturnMetrics($data_target);	
+		//$this->SendDebug(__FUNCTION__."[".__LINE__."]","RequestMetrics:".$string,0);
+		// echo $string;	
+
         
     	$this->SendDebug(__FUNCTION__,"Raw:".$data,0);
     	$this->SendDebug(__FUNCTION__,"APP:".$data_app,0);
@@ -164,9 +169,10 @@
 		if ( $data_type == "timeseries" or $targetset == true)		// Request Metrics
 			{
 			$string = $this->ReturnMetrics($data_target);	
-			$this->SendDebug(__FUNCTION__,"RequestMetrics:".$string,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]","RequestMetrics:".$string,0);
 			echo $string;	
-			return;	
+			
+			return ;	
 			}
 
 		if ( $data_app == "explore" )		// Explore
@@ -493,10 +499,8 @@
 
 		$s = '[{"target":"pps in","datapoints":[[122,'.$t1.'],[565,'.$t2.']]}]';
 
-		
 		$this->SendDebug(__FUNCTION__,$s,0);
 
-		echo $s;
 		}
 	
 		
@@ -567,7 +571,7 @@
 		{
 			
 
-		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+		// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 		$archiv = $this->GetArchivID();
 		$varList = IPS_GetVariableList ();
@@ -619,6 +623,8 @@
 		$string = substr($string, 0, -1);
 		$string = $string .']';
 		
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$string,0);
+
 		return $string;	
 
 		}		
