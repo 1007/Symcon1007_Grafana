@@ -93,6 +93,9 @@
 		$AuthUser = $this->ReadPropertyString("BasicAuthUser");	
 		$AuthPassword = $this->ReadPropertyString("BasicAuthPassword");	
 		
+		$HookStarttime = time();
+		$this->SendDebug(__FUNCTION__, "Hook Startime:".$this->TimestampToDate($HookStarttime), 0);	
+
 		$auth = false ;
 
 		if ($_SERVER['PHP_AUTH_USER'] == $AuthUser and $_SERVER['PHP_AUTH_PW'] == $AuthPassword) 
@@ -418,6 +421,11 @@
 			
 			echo $string;
 			
+			$HookEndtime = time();
+			$HookLaufzeit = $HookEndtime - $HookStarttime; 
+			$this->SendDebug(__FUNCTION__, "Hook Endtime:".$this->TimestampToDate($HookEndtime), 0);
+			$this->SendDebug(__FUNCTION__, "Hook Laufzeit:".$HookLaufzeit. " Sekunden", 0);
+
             // $this->sendtest();
 			return;
 
