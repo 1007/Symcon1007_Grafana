@@ -221,7 +221,8 @@
 					$data_hide[$x] = $target['hide'];
 					}
 				
-				$data_data[$x] = $target['data'];	// Additional Data
+				$data_data[$x]	= false;
+				$data_data[$x] = @$target['data'];	// Additional Data
 
 				
 
