@@ -130,7 +130,9 @@
 
 		// Sonderfall weil ohne 'type' ????????	
 		if ( isset($d['target'] ) )
-		   $data_target = $d['target'];
+			$data_target = $d['target'];
+		
+		   
 
 		$data_app 				= @$d['app'];
 		$data_requestId 		= @$d['requestId'];
@@ -140,32 +142,28 @@
 		$data_interval			= @$d['interval'];
 		$data_maxDataPoints		= @$d['maxDataPoints'];
 		
-	
-		
-		//$string = $this->ReturnMetrics($data_target);	
-		//$this->SendDebug(__FUNCTION__."[".__LINE__."]","RequestMetrics:".$string,0);
-		// echo $string;	
-
         
-    	$this->SendDebug(__FUNCTION__,"Raw:".$data,0);
-    	$this->SendDebug(__FUNCTION__,"APP:".$data_app,0);
-    	$this->SendDebug(__FUNCTION__,"TYPE:".$data_type,0);
-    	$this->SendDebug(__FUNCTION__,"RequestID:".$data_requestId,0);
-    	$this->SendDebug(__FUNCTION__,"Timezone:".$data_timezone,0);
-    	$this->SendDebug(__FUNCTION__,"PanelID:".$data_panelId,0);
-    	$this->SendDebug(__FUNCTION__,"Dashboard:".$data_dashboardId,0);
-    	$this->SendDebug(__FUNCTION__,"Intervall:".$data_interval,0);
-    	$this->SendDebug(__FUNCTION__,"MaxDatapoints:".$data_maxDataPoints,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","Raw:".$data,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","APP:".$data_app,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","TYPE:".$data_type,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","RequestID:".$data_requestId,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","Timezone:".$data_timezone,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","PanelID:".$data_panelId,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","Dashboard:".$data_dashboardId,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","Intervall:".$data_interval,0);
+    	$this->SendDebug(__FUNCTION__."[".__LINE__."]","MaxDatapoints:".$data_maxDataPoints,0);
+		if ( isset($data_target ))
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]","Target:".$data_target,0);
     	
 		
 		if (isset($data_target)) 
 			{
-            $this->SendDebug(__FUNCTION__, "Target ist gesetzt [".$data_target."]", 0);
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Target ist gesetzt [".$data_target."]", 0);
             $targetset = true;
         	}	
 		else
 			{
-			$this->SendDebug(__FUNCTION__, "Target ist nicht gesetzt", 0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Target ist nicht gesetzt", 0);
 			$targetset = false;
 			}	
 
@@ -178,10 +176,10 @@
 			return ;	
 			}
 
-		if ( $data_app == "explore" )		// Explore
+		if ( $data_app == "explore" and $targetset == true )		// Explore
 			{
 			$string = $this->ReturnMetrics($data_target);	
-			$this->SendDebug(__FUNCTION__,"Explore:".$string,0);
+			$this->SendDebug(__FUNCTION__.'['.__LINE__.']',"Explore:".$string,0);
 			// echo $string;	
 			// return;	
 			}
@@ -579,8 +577,8 @@
 	protected function ReturnMetrics($data_target)
 		{
 			
-
-		// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+		//$s = $data_target;
+		//$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 		$archiv = $this->GetArchivID();
 		$varList = IPS_GetVariableList ();
