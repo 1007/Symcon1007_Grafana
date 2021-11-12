@@ -94,7 +94,7 @@
 		$AuthPassword = $this->ReadPropertyString("BasicAuthPassword");	
 		
 		$HookStarttime = time();
-		$this->SendDebug(__FUNCTION__, "Hook Startime:".$this->TimestampToDate($HookStarttime), 0);	
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hook Startime:".$this->TimestampToDate($HookStarttime), 0);	
 
 		$auth = false ;
 
@@ -108,12 +108,12 @@
 			$this->SetStatus(202);
 			}	
 			
-		$this->SendDebug(__FUNCTION__, "Grafana AUTH:".$_SERVER['PHP_AUTH_USER']."-".$_SERVER['PHP_AUTH_PW'], 0);
-        $this->SendDebug(__FUNCTION__, "Modul AUTH:".$AuthUser."-".$AuthPassword, 0);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Grafana AUTH:".$_SERVER['PHP_AUTH_USER']."-".$_SERVER['PHP_AUTH_PW'], 0);
+        $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Modul AUTH:".$AuthUser."-".$AuthPassword, 0);
             
 		if ( $auth == false )
 			{
-			$this->SendDebug(__FUNCTION__, "Modul AUTH fehlerhaft!!", 0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Modul AUTH fehlerhaft!!", 0);
 			$this->SetStatus(202);
 			
 			return false;	
@@ -202,7 +202,7 @@
 			
 				if ( isset ($target['target']) == false )
 					{
-					$this->SendDebug(__FUNCTION__, "Target is empty! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Target is empty! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
                 	continue;
 					}	
 
@@ -225,14 +225,15 @@
 				
 
                 $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target:".$data_target[$x], 0);
-                $this->SendDebug(__FUNCTION__, "Hide:".$data_hide[$x], 0);
+				if ($data_hide[$x] != false )
+                	$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hide:".$data_hide[$x], 0);
                 $x++;
             	}
 	
 			// Keine Targets ?
 			if (isset($data_target) == false) 
 				{
-				$this->SendDebug(__FUNCTION__, "Alle Targets sind leer ! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Alle Targets sind leer ! Panel:".$data_panelId." Dashboard:".$data_dashboardId, 0);
                 	
                 return;
 				}
@@ -244,9 +245,9 @@
 			// if ( $data_hide == true )
 				// return;
 
-            // $this->SendDebug(__FUNCTION__, "From:".$data_rangefrom, 0);
-            // $this->SendDebug(__FUNCTION__, "To:".$data_rangeto, 0);
-			// $this->SendDebug(__FUNCTION__, "Hide:".$data_hide,0);
+            // $this->SendDebug(__FUNCTION__."[".__LINE__."]", "From:".$data_rangefrom, 0);
+            // $this->SendDebug(__FUNCTION__."[".__LINE__."]", "To:".$data_rangeto, 0);
+			// $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hide:".$data_hide,0);
 
             $data_rangefrom = strtotime($d['range']['from']);
             $data_rangeto   = strtotime($d['range']['to']);
@@ -255,11 +256,8 @@
 			if ( $data_rangeto > time() )
 				$data_rangeto = time();
 			
-            $this->SendDebug(__FUNCTION__, "From:".$this->TimestampToDate($data_rangefrom), 0);
-            $this->SendDebug(__FUNCTION__, "To:".$this->TimestampToDate($data_rangeto), 0);
-
-			
-
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "From:".$this->TimestampToDate($data_rangefrom) . " - " ."To:".$this->TimestampToDate($data_rangeto), 0);
+            
             // $agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto);
 
             $data_starttime = $d['startTime'];
@@ -267,7 +265,7 @@
             $data_starttime = $this->TimestampToDate($data_starttime);
 
 
-            $this->SendDebug(__FUNCTION__, "Startime:".$data_starttime, 0);
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Startime:".$data_starttime, 0);
 
             $stringall = "";
 			$loop = 0;
@@ -285,11 +283,11 @@
                 $ID = $pieces[0];
                 $target = @$pieces[1];
 
-                $this->SendDebug(__FUNCTION__, "Data ID:".$ID, 0);
+                $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data ID:".$ID, 0);
 			
 				if ($data_hide[$key] == true) 
 					{
-                    $this->SendDebug(__FUNCTION__, "Data ID: HIDE ", 0);
+                    $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data ID: HIDE ", 0);
 					continue; 
 					}
 
@@ -337,7 +335,7 @@
 					continue;
 				
                 $count = count($data);
-                $this->SendDebug(__FUNCTION__, "1. Versuch Data Count:".$count, 0);
+                $this->SendDebug(__FUNCTION__."[".__LINE__."]", "1. Versuch Data Count:".$count, 0);
 
 				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
 					{	
@@ -347,7 +345,7 @@
 						$counts = "Fehler";
 					else
 						$count = count($data);
-					$this->SendDebug(__FUNCTION__, "2. Versuch Data Count:".$count, 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "2. Versuch Data Count:".$count, 0);
 					}
 
 				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
@@ -358,7 +356,7 @@
 						$counts = "Fehler";
 					else
 						$count = count($data);
-					$this->SendDebug(__FUNCTION__, "3. Versuch Data Count:".$count, 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "3. Versuch Data Count:".$count, 0);
 					}
                  
 				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
@@ -366,7 +364,7 @@
 					$agstufe = 0; // stuendlich		
 					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
 					$count = count($data);
-					$this->SendDebug(__FUNCTION__, "4. Versuch Data Count:".$count, 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "4. Versuch Data Count:".$count, 0);
 					}
 
 				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
@@ -374,7 +372,7 @@
 					$agstufe = 1; // taeglich		
 					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
 					$count = count($data);
-					$this->SendDebug(__FUNCTION__, "5. Versuch Data Count:".$count, 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "5. Versuch Data Count:".$count, 0);
 					}
 
 
@@ -384,7 +382,7 @@
 				if ($count > 0) 
 					{
                     $string = $this->CreateReturnString($data, $target, $typ, $agstufe,$data_additional,$DataOffset,$TimeOffset,$additional_data);
-                    $this->SendDebug(__FUNCTION__, "Data String:".$string, 0);
+                    $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data String:".$string, 0);
 
                     $stringall = $stringall . "" .$string ;
 					};
@@ -402,18 +400,18 @@
 			// *************** Stoppuhr Ende
 			// $microtimesende = microtime(true);
 			// $microtime = $microtimesende - $microtimestart;
-			// $this->SendDebug(__FUNCTION__, "Microtime :".$microtime, 0);
+			// $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Microtime :".$microtime, 0);
 			// Ende neue Version
 
             $string = $this->CreateHeaderReturnString($stringall);
 
-            $this->SendDebug(__FUNCTION__, "Data String ALL :".$string, 0);
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data String ALL :".$string, 0);
 		
 			/* 
 			if ( $string == "[]" )	// Keine Daten, dann auch nicht senden
 				{
 				$string = "[{}]";	
-				$this->SendDebug(__FUNCTION__, "Data String ALL leer:", 0);
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data String ALL leer:", 0);
                 // return;
                 }	
 			*/ 
@@ -422,8 +420,8 @@
 			
 			$HookEndtime = time();
 			$HookLaufzeit = $HookEndtime - $HookStarttime; 
-			$this->SendDebug(__FUNCTION__, "Hook Endtime:".$this->TimestampToDate($HookEndtime), 0);
-			$this->SendDebug(__FUNCTION__, "Hook Laufzeit:".$HookLaufzeit. " Sekunden", 0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hook Endtime:".$this->TimestampToDate($HookEndtime), 0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hook Laufzeit:".$HookLaufzeit. " Sekunden", 0);
 
             // $this->sendtest();
 			return;
@@ -432,7 +430,7 @@
 		
 
 		if ($data_app != "dashboard") 	
-			$this->SendDebug(__FUNCTION__,"Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]","Unbekanntes Telegramm empfangen bzw Testtelegramm Raw:".$data,0);
 		
 
 		}
@@ -444,12 +442,12 @@
 		{
 		$AdditionalData = array();
 		
-		$this->SendDebug(__FUNCTION__, "" , 0);
+		// $this->SendDebug(__FUNCTION__."[".__LINE__."]", "" , 0);
 
 		if ( is_array($data ) )
 		foreach ($data as $key => $value)
 			{
-            $this->SendDebug(__FUNCTION__, "Input-".$key ."[" . $value . "]", 0);
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Input-".$key ."[" . $value . "]", 0);
             }	
 			
 		if ( isset($data['Aggregationsstufe']) == false )
@@ -486,7 +484,7 @@
 
 		foreach ($AdditionalData as $key => $value)
 			{
-            $this->SendDebug(__FUNCTION__, "Output-".$key ."[" . $value . "]", 0);
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-".$key ."[" . $value . "]", 0);
             }	
 			
 
@@ -506,7 +504,7 @@
 
 		$s = '[{"target":"pps in","datapoints":[[122,'.$t1.'],[565,'.$t2.']]}]';
 
-		$this->SendDebug(__FUNCTION__,$s,0);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 		}
 	
@@ -525,6 +523,32 @@
 	//******************************************************************************	
 	protected function CheckZeitraumForAggregatedValues($from,$to,$varID,$AggregationsStufe)
 		{
+
+		switch ( $AggregationsStufe )
+			{
+				case 0		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Stuendliche Aggregation", 0);
+								break;
+				case 1		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Taegliche Aggregation", 0);
+								break;
+				case 2		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Woechentliche Aggregation", 0);
+								break;
+				case 3		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Monatliche Aggregation", 0);
+								break;
+				case 4		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Jaehrliche Aggregation", 0);
+								break;
+				case 5		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "5-Minuetige Aggregation", 0);
+								break;
+				case 6		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "1-Minuetige Aggregation", 0);
+								break;
+				case 99		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Maximale Aufloesung", 0);
+								break;
+				case -1		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Keine Aggregation uebergeben", 0);
+								break;
+
+
+				default		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Aggregation unbekannt", 0);				
+
+			}	
 		$archiv = $this->GetArchivID();
 		$aggType = AC_GetAggregationType($archiv,$varID);
 
@@ -646,7 +670,7 @@
 	
 		$offset = floatval($DataOffset);
 		$s = "Offsetwert neu:".$offset;
-		$this->SendDebug(__FUNCTION__,$s,0);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 	
 		
 		if ( isset($data_data['additional']) == true )
@@ -655,7 +679,7 @@
 					{
 					$offset = floatval($data_data['value']);
 					$s = "Offsetwert alt:".$offset;
-					$this->SendDebug(__FUNCTION__,$s,0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 					}	
 	
@@ -691,7 +715,7 @@
            else
 				{
 				// Aggregation
-				// IPS_LogMessage(__FUNCTION__,"");
+				// IPS_LogMessage(__FUNCTION__."[".__LINE__."]","");
 
 				$min = false;
 				$max = false;
@@ -726,7 +750,7 @@
 					$v = $v + $offset;
 					
 					$s = "V + True Offset vorher nachher :".$vorher. "-" . $v;
-					// $this->SendDebug(__FUNCTION__,$s,0);
+					// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 					$v = str_replace(",", ".", $v);
 					}
 				else
@@ -736,7 +760,7 @@
 
 					$v = $v + $offset;
 					$s = "V + False Offset vorher nachher :".$vorher. "-" . $v;
-					// $this->SendDebug(__FUNCTION__,$s,0);
+					// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 					$v = str_replace(",", ".", $v);
 					}	
 				}
@@ -783,7 +807,7 @@
 		if ( $status == FALSE )
 			{
 			$s = " Variable wird nicht geloggt : ".$id;	
-			$this->SendDebug(__FUNCTION__,$s,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			return FALSE;
 
 			}	
@@ -797,14 +821,14 @@
 		if ($agstufe == 99) 
 			{
 			$s = "GetloggedValues".$archiv."-".$id."-".$from."-".$to;	
-			$this->SendDebug(__FUNCTION__,$s,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0);
 			// print_r($werte);
 			}
 		else
 			{
 			$s = "GetAggregatedValues:".$agstufe."-".$archiv."-".$id."-".$from."-".$to;	
-			$this->SendDebug(__FUNCTION__,$s,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$werte = @AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
 			}	
 
@@ -855,11 +879,11 @@
 			{
 			$letzter_Wert = GetValue($id);
 			$s = "Noch keine Daten geloggt aktueller Wert :".$letzter_Wert. " ID:".$id;
-			$this->SendDebug(__FUNCTION__,$s,0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			}	
 
 		$s = "Erster Wert:[".$erster_Wert."] - Letzter Wert:[".$letzter_Wert."]";
-		$this->SendDebug(__FUNCTION__,$s,0);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 
 		if ($aggType == 0)	// Bei Zaehler keine erster/letzter Wert wegen komischer Anzeige (kleine Balken)
@@ -941,7 +965,7 @@
 		
 		if ( is_numeric($var) == false )
 			{
-			$this->SendDebug(__FUNCTION__,"Variable ist keine Zahl : ". $var, 0);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]","Variable ist keine Zahl : ". $var, 0);
 			$this->Logmessage("Grafana Variable ID ".$var." Fehler !",KL_WARNING);
 			return false;	
 			}
@@ -979,7 +1003,7 @@
 					{
 					if ($hook['TargetID'] == $this->InstanceID) 
 						{
-						$this->SendDebug(__FUNCTION__,"Hook bereits vorhanden : ". $hook['TargetID'], 0);
+						$this->SendDebug(__FUNCTION__."[".__LINE__."]","Hook bereits vorhanden : ". $hook['TargetID'], 0);
 						return;		// bereits vorhanden
 						}
 					$hooks[$index]['TargetID'] = $this->InstanceID;
@@ -991,7 +1015,7 @@
 					{
 					$hooks[] = ['Hook' => $WebHook, 'TargetID' => $this->InstanceID];
 					}
-				$this->SendDebug(__FUNCTION__, $WebHook ." erstellt" , 0);
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]", $WebHook ." erstellt" , 0);
 				IPS_SetProperty($ids[0], 'Hooks', json_encode($hooks));
 				IPS_ApplyChanges($ids[0]);
 			}
