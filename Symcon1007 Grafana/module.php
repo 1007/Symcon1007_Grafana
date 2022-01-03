@@ -230,8 +230,8 @@
 				
 				if ( isset($target['payload']))
 					{
-						$data_data[$x] = @$target['payload'];	// Additional Data
-						foreach($target['payload'] as $key => $value)
+					$data_data[$x] = @$target['payload'];	// Additional Data
+					foreach($data_data[$x] as $key => $value)
 						$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$key. " - ".$value, 0);
 
 					}	
