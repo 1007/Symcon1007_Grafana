@@ -23,7 +23,8 @@
 		
 		$this->RegisterPropertyString("BasicAuthUser", "");
 		$this->RegisterPropertyString("BasicAuthPassword", "");
-		
+		$this->RegisterPropertyBoolean("Logging", false); 
+
 		$runlevel = IPS_GetKernelRunlevel();
 		if ( $runlevel == KR_READY )
 			{
@@ -84,6 +85,7 @@
 	protected function ProcessHookData()
 		{
 		GLOBAL $_IPS;
+		GLOBAL $data_panelId;
 
 		if(!isset($_SERVER['PHP_AUTH_USER']))
 			$_SERVER['PHP_AUTH_USER'] = "";
@@ -143,6 +145,9 @@
 		$data_maxDataPoints		= @$d['maxDataPoints'];
 		
         
+		$this->Logging("PanelID:".$data_panelId,$data_panelId,true);			
+
+
     	$this->SendDebug(__FUNCTION__."[".__LINE__."]","Raw:".$data,0);
     	$this->SendDebug(__FUNCTION__."[".__LINE__."]","APP:".$data_app,0);
     	$this->SendDebug(__FUNCTION__."[".__LINE__."]","TYPE:".$data_type,0);
@@ -221,8 +226,17 @@
 				
 				$data_data[$x]	= false;
 				$data_data[$x] = @$target['data'];	// Additional Data
-
+				// $data_data[$x] = @$target['payload'];	// Additional Data
 				
+				if ( isset($target['payload']))
+					{
+						$data_data[$x] = @$target['payload'];	// Additional Data
+						foreach($target['payload'] as $key => $value)
+						$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$key. " - ".$value, 0);
+
+					}	
+
+				// $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$ss, 0);
 
                 $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target:".$data_target[$x], 0);
 				if ($data_hide[$x] != false )
@@ -256,8 +270,12 @@
 			if ( $data_rangeto > time() )
 				$data_rangeto = time();
 			
-            $this->SendDebug(__FUNCTION__."[".__LINE__."]", "From:".$this->TimestampToDate($data_rangefrom) . " - " ."To:".$this->TimestampToDate($data_rangeto), 0);
-            
+
+			$output = "From:".$this->TimestampToDate($data_rangefrom) . " - " ."To:".$this->TimestampToDate($data_rangeto);	
+            $this->SendDebug(__FUNCTION__."[".__LINE__."]", $output, 0);
+            $this->Logging($output,$data_panelId);
+
+
             // $agstufe = $this->CheckZeitraumForAggregatedValues($data_rangefrom, $data_rangeto);
 
             $data_starttime = $d['startTime'];
@@ -524,6 +542,8 @@
 	protected function CheckZeitraumForAggregatedValues($from,$to,$varID,$AggregationsStufe)
 		{
 
+		GLOBAL $data_panelId;
+
 		switch ( $AggregationsStufe )
 			{
 				case 0		:	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Stuendliche Aggregation", 0);
@@ -589,7 +609,9 @@
 			
 		$s = "Anzahl Tage:".$days . " Aggreagationsstufe:".$stufe ." Aggregationstype:".$aggType;
 
+
 		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+		$this->Logging($s,$data_panelId);
 
 		return $stufe;
 
@@ -799,6 +821,8 @@
 	protected function GetArchivData($id,$from,$to,$agstufe,$typ)
 		{
 		
+		GLOBAL $data_panelId;
+
 		$werte = array();
 
 		$archiv = $this->GetArchivID();
@@ -822,6 +846,7 @@
 			{
 			$s = "GetloggedValues".$archiv."-".$id."-".$from."-".$to;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+			$this->Logging($s,$data_panelId);
 			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0);
 			// print_r($werte);
 			}
@@ -829,6 +854,7 @@
 			{
 			$s = "GetAggregatedValues:".$agstufe."-".$archiv."-".$id."-".$from."-".$to;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+			$this->Logging($s,$data_panelId);
 			$werte = @AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
 			}	
 
@@ -957,10 +983,12 @@
 
 
 	//******************************************************************************
-	//	Variable ueberpruefen (existiert/geloggt)
+	//	Variable ueberpruefen (existiert/geloggt/OK)
 	//******************************************************************************
 	protected function CheckVariable($var)
 		{
+		GLOBAL $data_panelId;
+
 		$archiv = $this->GetArchivID();
 		
 		if ( is_numeric($var) == false )
@@ -970,8 +998,24 @@
 			return false;	
 			}
 
+
 		$status = IPS_VariableExists($var);
 		
+		// Testen ob Variable isValid
+		$arr = AC_GetAggregationVariables ($archiv, false);
+		if ( $arr == true )
+			{
+			/* if ( isset($arr['VariableID'] == $var) )
+				{
+				if ( isset($arr['IsValid']) )	
+					{
+
+					}
+
+				}	
+*/
+			}
+
 		// rausgenommen,wenn nicht geloggt wird letzter Wert genommen (Gauge)
 		/*
 		if ( $status == true )
@@ -984,6 +1028,38 @@
 		return $status;
 		}
 	
+    //**************************************************************************
+	// Logging
+	//**************************************************************************
+	private function Logging($Text,$file="Grafana",$delete=false,$date=true)
+		{
+		if ( $this->ReadPropertyBoolean("Logging") == false )
+			return;
+
+		$ordner = IPS_GetLogDir() . "Grafana";
+		if ( !is_dir ( $ordner ) )
+			mkdir($ordner);
+
+		if ( !is_dir ( $ordner ) )
+			return;
+                
+		$time = date("d.m.Y H:i:s");
+		$logdatei = IPS_GetLogDir() . "Grafana/".$file.".log";
+		
+                if ( $delete == true )
+                    @unlink($logdatei);
+                
+				$datei = fopen($logdatei,"a+");
+		
+		if ( $date == true )		
+			fwrite($datei, $time ." ". $Text . chr(13));
+		else
+			fwrite($datei,$Text . chr(13));
+		
+		fclose($datei);
+		
+		}
+
 
 	//******************************************************************************
 	//	Erstelle Hook

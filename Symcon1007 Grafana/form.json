@@ -10,7 +10,15 @@
     
     { "type": "ValidationTextBox", "name": "BasicAuthUser", "caption": "User" },
     
-    { "type": "PasswordTextBox", "name": "BasicAuthPassword", "caption": "Passwort" }
+    { "type": "PasswordTextBox", "name": "BasicAuthPassword", "caption": "Passwort" },
+
+
+    { "type": "ExpansionPanel", "caption": "Einstellungen",
+      "items": 	
+        [	  
+          { "type": "CheckBox"          , "name" :  "Logging", "caption": "Logging (../logs/Grafana/)" } 
+        ]
+    }
 
 
   ],
