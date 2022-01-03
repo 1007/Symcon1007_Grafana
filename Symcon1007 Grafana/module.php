@@ -231,8 +231,8 @@
 				if ( isset($target['payload']))
 					{
 					$data_data[$x] = @$target['payload'];	// Additional Data
-					foreach($data_data[$x] as $key => $value)
-						$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$key. " - ".$value, 0);
+					//foreach($data_data[$x] as $key => $value)
+					//	$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$key. " - ".$value, 0);
 
 					}	
 
@@ -1033,6 +1033,8 @@
 	//**************************************************************************
 	private function Logging($Text,$file="Grafana",$delete=false,$date=true)
 		{
+
+			return;
 		if ( $this->ReadPropertyBoolean("Logging") == false )
 			return;
 
