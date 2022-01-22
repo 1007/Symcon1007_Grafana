@@ -830,9 +830,13 @@
 		$status = AC_GetLoggingStatus ($archiv, $id);
 		if ( $status == FALSE )
 			{
-			$s = " Variable wird nicht geloggt : ".$id;	
+			$aktuell = 	GetValue($id);
+			$s = " Variable wird nicht geloggt : ".$id . " aktuellen Wert nehmen: ".$aktuell;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
-			return FALSE;
+			$reversed = array();
+			array_push($reversed, array("TimeStamp"=>$to,"Value"=>$aktuell));
+			// return FALSE;
+			return $reversed;
 
 			}	
 
