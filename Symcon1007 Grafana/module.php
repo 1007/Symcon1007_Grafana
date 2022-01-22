@@ -831,9 +831,20 @@
 		if ( $status == FALSE )
 			{
 			$aktuell = 	GetValue($id);
+			$arrayVar =  IPS_GetVariable($id);
+
 			$s = " Variable wird nicht geloggt : ".$id . " aktuellen Wert nehmen: ".$aktuell;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$reversed = array();
+
+			$typ = $arrayVar['VariableType'];	
+			if ( $typ == 3 )	// String
+				{
+				// $aktuell = "String";
+				$aktuell = '"'.$aktuell.'"';
+				}
+
+			
 			array_push($reversed, array("TimeStamp"=>$to,"Value"=>$aktuell));
 			// return FALSE;
 			return $reversed;
