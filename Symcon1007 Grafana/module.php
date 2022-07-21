@@ -311,7 +311,21 @@
 
 				$additional_data = $this->GetAdditionalData($data_data[$key]);
 
+				if ($additional_data['TimeOffset'] == 0 )
+					{
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset = 0 ", 0);
+					}	
+				else
+					{
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset =  ".$additional_data['TimeOffset'] , 0);
 					
+					$data_rangefrom = $data_rangefrom - $additional_data['TimeOffset'];
+					$data_rangeto   = $data_rangeto - $additional_data['TimeOffset'];
+		
+
+					}	
+
+
 				$data_additional = false ;
 				
 				$add = -1;	// 0 nicht moeglich
@@ -347,7 +361,7 @@
 
 				
 				// Archivdaten fuer eine Variable holen
-				$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);       
+				$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ,$additional_data);       
 				
 				if($data == FALSE)	// wird nicht geloggt
 					continue;
@@ -358,7 +372,7 @@
 				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
 					{	
 					$agstufe = 6; // 1 minuetig		
-					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ,$additional_data);
 					if ( $data == false )
 						$counts = "Fehler";
 					else
@@ -369,7 +383,7 @@
 				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
 					{	
 					$agstufe = 5; // 5 minuetig	Problem !!!	
-					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ,$additional_data);
 					if ( $data == false )
 						$counts = "Fehler";
 					else
@@ -380,7 +394,7 @@
 				if( $count > $RecordLimit or $count == false )		// Maximale Anzahl Daten erreicht
 					{	
 					$agstufe = 0; // stuendlich		
-					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ,$additional_data);
 					$count = count($data);
 					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "4. Versuch Data Count:".$count, 0);
 					}
@@ -388,7 +402,7 @@
 				if( $count > $RecordLimit )		// Maximale Anzahl Daten erreicht
 					{	
 					$agstufe = 1; // taeglich		
-					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ);
+					$data = $this->GetArchivData($ID, $data_rangefrom, $data_rangeto, $agstufe,$typ,$additional_data);
 					$count = count($data);
 					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "5. Versuch Data Count:".$count, 0);
 					}
@@ -396,6 +410,19 @@
 
 				$DataOffset = $additional_data['DataOffset'];
 				$TimeOffset = $additional_data['TimeOffset'];
+				$TimeOffset = 0;
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffSet:".$TimeOffset, 0);
+				
+
+				if ( isset($additional_data['ReverseData']) == true )
+					if ( $additional_data['ReverseData'] == true )
+						{
+						$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Data Reverse.", 0);
+
+						$data = array_reverse($data);
+
+						}
+
 
 				if ($count > 0) 
 					{
@@ -459,8 +486,9 @@
 	protected function GetAdditionalData($data)
 		{
 		$AdditionalData = array();
-		
-		// $this->SendDebug(__FUNCTION__."[".__LINE__."]", "" , 0);
+
+		$j =  json_encode($data,true);
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]", $j, 0);
 
 		if ( is_array($data ) )
 		foreach ($data as $key => $value)
@@ -480,6 +508,12 @@
 		if ( isset($data['AggregationsMax']) == true )
 			$AdditionalData['AggregationsMax'] = $data['AggregationsMax'];	
 
+		if ( isset($data['LastValues']) == true )
+			$AdditionalData['LastValues'] = $data['LastValues'];
+		else	
+			$AdditionalData['LastValues'] = false;
+
+
 		if ( isset($data['Resolution']) == false )
 			$AdditionalData['Resolution'] = -1;
 		else	 
@@ -490,13 +524,27 @@
 		else	 
 			$AdditionalData['DataOffset'] = $data['DataOffset'];	
 
-		if ( isset($data['TimeOffset']) == false )
+		if ( isset($data['additional']) == false )
+			{
 			$AdditionalData['TimeOffset'] = 0;
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset false", 0);
+            
+			}
 		else	 
-			$AdditionalData['TimeOffset'] = $data['TimeOffset'];	
+			{
+			if ($data['additional'] == 'TimeOffset')
+				{
+				$value = $data['value']; 	
+				$AdditionalData['TimeOffset'] = $value;
+				}
+
+			}
 
 		if ( isset($data['DataFilter']) == true )
 			$AdditionalData['DataFilter'] = $data['DataFilter'];
+
+		if ( isset($data['ReverseData']) == true )
+			$AdditionalData['ReverseData'] = $data['ReverseData'];
 
 			
 
@@ -788,7 +836,8 @@
 				}
 
 			
-			$Timestamp = $value['TimeStamp'] + intval($TimeOffset);	
+			// $Timestamp = $value['TimeStamp'] + intval($TimeOffset);	
+			$Timestamp = $value['TimeStamp'];
 			$t = $this->TimestampToGrafanaTime($Timestamp);	
 			$string = $string ."[" .$v.",".$t."],";		
 
@@ -818,7 +867,7 @@
 	//******************************************************************************
 	//	Werte einer Variablen aus dem Archiv holen
 	//******************************************************************************
-	protected function GetArchivData($id,$from,$to,$agstufe,$typ)
+	protected function GetArchivData($id,$from,$to,$agstufe,$typ,$additional_data)
 		{
 		
 		GLOBAL $data_panelId;
@@ -828,16 +877,17 @@
 		$archiv = $this->GetArchivID();
 
 		$status = AC_GetLoggingStatus ($archiv, $id);
+		$arrayVar =  IPS_GetVariable($id);
+		$typ = $arrayVar['VariableType'];
+
 		if ( $status == FALSE )
 			{
 			$aktuell = 	GetValue($id);
-			$arrayVar =  IPS_GetVariable($id);
-
+			
 			$s = " Variable wird nicht geloggt : ".$id . " aktuellen Wert nehmen: ".$aktuell;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$reversed = array();
-
-			$typ = $arrayVar['VariableType'];	
+	
 			if ( $typ == 3 )	// String
 				{
 				// $aktuell = "String";
@@ -856,13 +906,19 @@
 		// 1 = Zaehler
 		$aggType = AC_GetAggregationType($archiv,$id);
 
+		$limit = 0;
+		if ( isset($additional_data['LastValues']) == true )
+			$limit = $additional_data['LastValues'];
+		$limit = 0;	
 
 		if ($agstufe == 99) 
 			{
-			$s = "GetloggedValues".$archiv."-".$id."-".$from."-".$to;	
+			
+			$s = "GetloggedValues:".$id." - ".$this->TimestampToDate($from)." - ".$this->TimestampToDate($to). " - Limit : ".$limit;	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$this->Logging($s,$data_panelId);
-			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, 0);
+			$werte = AC_GetLoggedValues($archiv, $id, $from, $to, $limit);
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]","Count: ".@count($werte),0);
 			// print_r($werte);
 			}
 		else
@@ -874,11 +930,29 @@
 			}	
 
 		if ( is_array($werte) == false )
+			{
+			$s = "Kein Result : ";	
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);	
 			return false;
+
+			}
 
 		$reversed = array_reverse($werte);
 		
 		$count = count($werte);
+
+		$s = "Anzahl der Werte : ".$count;	
+		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);	
+
+		// LastValues erarbeiten
+		if ( isset($additional_data['LastValues']) == true )
+			{
+			$s = "LastValues Return : ";	
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);	
+		
+			// return $reversed;
+			}
+
 		
 		if ( $aggType ==1 )
 		{
@@ -900,12 +974,15 @@
 			$array = AC_GetLoggedValues($archiv, $id, 0, 0, 1);
 			
             $erster_Wert  = @AC_GetLoggedValues($archiv, $id, 0, $from-1, 1);	// erster Wert vorhanden ?
-			
+			$s = "Erster Wert: OK [";
 			// Wenn es im Zeitbereich keinen ersten Wert gibt dann auf FALSE
 			if ( $erster_Wert != false )
 				{
 				$erster_Wert = $erster_Wert[0]['Value'];
 				$erster_WertOK = true;
+				$s = "Erster Wert:[".$erster_Wert."] - Letzter Wert:[".$letzter_Wert."]";
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+		
 				}
 			else
 				{
@@ -954,6 +1031,25 @@
 				}
 				
         	}		
+
+		if ( $typ == 3 )		// Stringwerte
+			{
+			$s = "Achtung Wert sind Strings ";
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+	
+			foreach($reversed as $key => $value)
+				{
+				if ( isset($value['Value'] ))	
+					{
+					$str = 	$value['Value'];
+					$str = '"'.$str.'"';
+						
+					$reversed[$key]['Value'] = $str;
+					}
+
+				}	
+
+			}	
 
 		return $reversed;
 		}
