@@ -70,6 +70,7 @@ Fuer jeden Graph kann neben dem Feld "Metric"
 das Feld "Additional JSON Data" benutzt werden.
 Dort kann eine Aggregationstufe , als JSON String ,
 fest vorgegeben werden.
+In der aktuellen Grafana Version heisst das Feld jetzt "Payload" !
 ![Additional JSON Data](imgs/JSON.png?raw=true "Additional JSON Data")
 
 - Stufe 0		Stuendliche Aggregation

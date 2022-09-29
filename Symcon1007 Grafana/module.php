@@ -238,7 +238,20 @@
 
 				// $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Additional Data:".$ss, 0);
 
-                $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target:".$data_target[$x], 0);
+				$ObjectType = IPS_GetObject($data_target[$x]) ;
+				$ObjectType = $ObjectType['ObjectType'];
+				if ( $ObjectType == 6 )
+					{
+					
+					$Link = IPS_GetLink($data_target[$x]);
+					$data_target[$x] = $Link['TargetID'];
+
+					$this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Type ist Link : ".$ObjectType . " - ".$Link['TargetID'], 0);
+					}
+
+					
+                $this->SendDebug(__FUNCTION__.'['.__LINE__.']', "Target:".$data_target[$x] . " - Type : ".$ObjectType, 0);
+
 				if ($data_hide[$x] != false )
                 	$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Hide:".$data_hide[$x], 0);
                 $x++;
@@ -524,6 +537,12 @@
 		else	 
 			$AdditionalData['DataOffset'] = $data['DataOffset'];	
 
+		if ( isset($data['yoffset']) == false )
+			$AdditionalData['Yoffset'] = 0;
+		else	 
+			$AdditionalData['Yoffset'] = $data['yoffset'];	
+
+
 		if ( isset($data['additional']) == false )
 			{
 			$AdditionalData['TimeOffset'] = 0;
@@ -739,22 +758,34 @@
 		$offset = 0;
 	
 		$offset = floatval($DataOffset);
-		$s = "Offsetwert neu:".$offset;
-		$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+		$s = "Y-Offsetwert neu:".$offset;
+		// $this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 	
+
+		if(isset($additional_data['Yoffset']))
+        	{
+			$offset = $additional_data['Yoffset'];
+			$s = "Y-Offsetwert neu:".$offset;
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
+			}
+
 		
+		/*			
 		if ( isset($data_data['additional']) == true )
+			{
+				$this->SendDebug(__FUNCTION__."[".__LINE__."]","------",0);
+
 			if ( $data_data['additional'] == 'yoffset' )
 				if ( isset($data_data['value']) == true )
 					{
 					$offset = floatval($data_data['value']);
-					$s = "Offsetwert alt:".$offset;
+					$s = "Y-Offsetwert alt:".$offset;
 					$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 
 					}	
-	
-
-		
+				}
+		*/		
+					
 		$target = addslashes($target);
 
 		$string = '{"target":"'.$target.'","datapoints":[';
