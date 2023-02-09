@@ -87,6 +87,9 @@
 		GLOBAL $_IPS;
 		GLOBAL $data_panelId;
 
+		// IPS_LogMessage("WebSocket", file_get_contents("php://input"));
+
+
 		if(!isset($_SERVER['PHP_AUTH_USER']))
 			$_SERVER['PHP_AUTH_USER'] = "";
 		if(!isset($_SERVER['PHP_AUTH_PW']))
@@ -423,7 +426,7 @@
 
 				$DataOffset = $additional_data['DataOffset'];
 				$TimeOffset = $additional_data['TimeOffset'];
-				$TimeOffset = 0;
+				// $TimeOffset = 0;
 				$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffSet:".$TimeOffset, 0);
 				
 
@@ -543,11 +546,11 @@
 			$AdditionalData['Yoffset'] = $data['yoffset'];	
 
 
+		/* veraltet	
 		if ( isset($data['additional']) == false )
 			{
 			$AdditionalData['TimeOffset'] = 0;
-			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset false", 0);
-            
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset false", 0); 
 			}
 		else	 
 			{
@@ -556,8 +559,20 @@
 				$value = $data['value']; 	
 				$AdditionalData['TimeOffset'] = $value;
 				}
-
 			}
+		*/	
+		if ( isset($data['TimeOffset']) == false )
+			{
+			$AdditionalData['TimeOffset'] = 0;
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset false", 0); 
+			}
+		else	 
+			{
+			$AdditionalData['TimeOffset'] = $data['TimeOffset'];
+			}
+			
+
+
 
 		if ( isset($data['DataFilter']) == true )
 			$AdditionalData['DataFilter'] = $data['DataFilter'];
@@ -923,6 +938,7 @@
 				{
 				// $aktuell = "String";
 				$aktuell = '"'.$aktuell.'"';
+				
 				}
 
 			
@@ -1074,7 +1090,7 @@
 					{
 					$str = 	$value['Value'];
 					$str = '"'.$str.'"';
-						
+					
 					$reversed[$key]['Value'] = $str;
 					}
 
