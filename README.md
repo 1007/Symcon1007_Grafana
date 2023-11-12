@@ -137,6 +137,8 @@ Entsprechend die mygrafana.css erstellen und folgendes eintragen.
 	border: 0px solid #FFFFFF !important;
 	}
 
+Bei dem Plugin JSON by simpo die Vesrion 0.30 benutzen.
+Die neueren Versionen benutzen ein anderes Protokoll.
 
 
 
