@@ -83,6 +83,8 @@ In der aktuellen Grafana Version heisst das Feld jetzt "Payload" !
 - Stufe 99	keine Aggregation ( maximale Aufloesung )
 
 
+- TimeOffset	Vergleich zwischen zB 2 Zeitraeumen
+	{"TimeOffset" : 2592000} holt die Daten 30 Tage von der Vergangenheit	
 
 ## 6. GrafanaTips
 Aenderung in der Konfigurationsdatei von Grafana sollen nicht in der defaults.ini
@@ -148,7 +150,6 @@ Version 1.0	Startup
 Version 1.1 Verschiedene Fehler behoben. Doku verbessert.
 
 ## 8. ToDoListe
-Aggregationsstufen optimieren.
 
 Dokumentation verbessern.
 

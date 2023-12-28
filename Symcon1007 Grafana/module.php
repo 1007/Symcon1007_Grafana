@@ -118,6 +118,8 @@
             
 		if ( $auth == false )
 			{
+
+			echo "Verbindung OK . User Password fehlerhaft !";
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Modul AUTH fehlerhaft!!", 0);
 			$this->SetStatus(202);
 			
@@ -127,6 +129,7 @@
 		$data = file_get_contents("php://input");
 
 		$d = json_decode($data,true);
+
 
 		if ( isset($d['type'] ) )
 			$data_type 	= $d['type'];
@@ -183,6 +186,14 @@
 			
 			return ;	
 			}
+
+		if ($data == '{"payload":{}}' or $data == '{}')		// Add Metric ab Version 10.2 ???
+			{
+				$string = $this->ReturnMetrics($data_target);	
+				$this->SendDebug(__FUNCTION__.'['.__LINE__.']',"Explore:".$string,0);
+				return;
+			}
+
 
 		if ( $data_app == "explore" and $targetset == true )		// Explore
 			{
@@ -335,9 +346,13 @@
 					{
 					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset =  ".$additional_data['TimeOffset'] , 0);
 					
+					//$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset =  ".$this->TimestampToDate($data_rangefrom) , 0);
+
 					$data_rangefrom = $data_rangefrom - $additional_data['TimeOffset'];
 					$data_rangeto   = $data_rangeto - $additional_data['TimeOffset'];
-		
+					
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset from =  ".$this->TimestampToDate($data_rangefrom) , 0);
+					$this->SendDebug(__FUNCTION__."[".__LINE__."]", "TimeOffset to   =  ".$this->TimestampToDate($data_rangeto) , 0);
 
 					}	
 
@@ -546,21 +561,6 @@
 			$AdditionalData['Yoffset'] = $data['yoffset'];	
 
 
-		/* veraltet	
-		if ( isset($data['additional']) == false )
-			{
-			$AdditionalData['TimeOffset'] = 0;
-			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset false", 0); 
-			}
-		else	 
-			{
-			if ($data['additional'] == 'TimeOffset')
-				{
-				$value = $data['value']; 	
-				$AdditionalData['TimeOffset'] = $value;
-				}
-			}
-		*/	
 		if ( isset($data['TimeOffset']) == false )
 			{
 			$AdditionalData['TimeOffset'] = 0;
@@ -569,6 +569,7 @@
 		else	 
 			{
 			$AdditionalData['TimeOffset'] = $data['TimeOffset'];
+			$this->SendDebug(__FUNCTION__."[".__LINE__."]", "Output-TimeOffset : ".$AdditionalData['TimeOffset'], 0); 
 			}
 			
 
@@ -882,8 +883,21 @@
 				}
 
 			
-			// $Timestamp = $value['TimeStamp'] + intval($TimeOffset);	
-			$Timestamp = $value['TimeStamp'];
+			// $Timestamp = $value['TimeStamp'] - intval($TimeOffset);	
+
+			if ( $TimeOffset == 0 )
+				{
+				$Timestamp = $value['TimeStamp'];
+				}
+			else
+				{
+				// Zeitstempel muss in die "Zukunft" verarbeitet werden
+				$Timestamp = $value['TimeStamp'] + intval($TimeOffset);
+
+				}
+				
+			
+			
 			$t = $this->TimestampToGrafanaTime($Timestamp);	
 			$string = $string ."[" .$v.",".$t."],";		
 
@@ -970,7 +984,7 @@
 			}
 		else
 			{
-			$s = "GetAggregatedValues:".$agstufe."-".$archiv."-".$id."-".$from."-".$to;	
+			$s = "GetAggregatedValues:".$agstufe."-".$archiv."-".$id."- von:".$this->TimestampToDate($from)."- bis:".$this->TimestampToDate($to);	
 			$this->SendDebug(__FUNCTION__."[".__LINE__."]",$s,0);
 			$this->Logging($s,$data_panelId);
 			$werte = @AC_GetAggregatedValues ($archiv,$id,$agstufe,$from,$to,0);	
